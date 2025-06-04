@@ -1,0 +1,41 @@
+# ASGI server
+uvicorn~=0.23.2
+
+# Web framework and related libraries
+fastapi~=0.110.3
+aiofiles~=23.1.0
+python-multipart~=0.0.9  # Handling form data in FastAPI
+
+# Authentication and Security
+python-jose~=3.3.0  # JWT tokens
+PyJWT~=2.8.0  # Additional JWT handling
+bcrypt~=4.0.1  # Password hashing (already implemented)
+cryptography~=42.0.5  # Needed for JWT & security
+
+# Task queue and background workers
+celery~=5.4.0
+redis~=4.6.0  # Redis support for Celery
+flower~=1.2.0  # Celery monitoring tool
+kombu~=5.3.5  # Needed for Celery-Redis integration
+
+# Database and ORM
+SQLAlchemy~=2.0.37
+psycopg2-binary~=2.9.10  # PostgreSQL driver
+alembic~=1.13.1  # Database migrations
+
+# Timezone support
+pytz~=2024.1  # Handle timezones correctly
+
+# Data science and machine learning
+numpy~=1.26.4
+pandas~=2.2.0
+scipy==1.10.1  # Pin to compatible version
+torch~=2.2.2
+torchvision~=0.17.2
+scikit-learn~=1.4.1
+umap-learn~=0.5.5
+lifelines~=0.27.8
+kneed~=0.8.5
+
+# Environment management
+python-dotenv~=1.0.1  # Managing environment variables

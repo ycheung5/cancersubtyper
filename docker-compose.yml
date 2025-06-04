@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cancersubtyper
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: ./app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    env_file:
+      - ./app/.env
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
+  api:
+    build:
+      context: ./api
+      args:
+        INSTALL_R: "false"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/app
+    restart: always
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: ./api
+      args:
+        INSTALL_R: "true"
+    working_dir: /app
+    command: ["celery", "-A", "celery_config", "worker", "--loglevel=info", "--concurrency=2"]
+    volumes:
+      - ./api:/app
+      - ./api/data:/app/data
+    env_file:
+      - ./api/.env
+    depends_on:
+      - redis
+      - db
+      - api
+
+  flower:
+    container_name: flower
+    build:
+      context: ./api
+      args:
+        INSTALL_R: "false"
+    working_dir: /app
+    command: ["celery", "-A", "celery_config", "flower", "--broker=$(CELERY_BROKER_URL)", "--port=5555"]
+    volumes:
+      - ./api:/app
+    ports:
+      - "5556:5555"
+    env_file:
+      - ./api/.env
+    depends_on:
+      - redis
+      - celery_worker
+
+volumes:
+  postgres_data:
