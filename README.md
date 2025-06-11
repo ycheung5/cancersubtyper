@@ -29,3 +29,5 @@ CancerSubtyper includes:
 ```bash
 git clone https://github.com/your-username/cancersubtyper.git
 cd cancersubtyper
+docker compose up --build
+```
