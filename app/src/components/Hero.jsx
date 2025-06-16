@@ -29,7 +29,7 @@ const Hero = () => {
                     </h1>
 
                     <p className="mb-6 text-xl font-medium leading-relaxed">
-                        Leveraging the power of <span className="text-red-400 font-semibold">deep learning</span>
+                        Leveraging the power of <span className="text-red-400 font-semibold">deep learning </span>
                         to revolutionize <span className="text-red-400 font-semibold">cancer subtyping.</span> <br />
                         Gain precise insights and advance predictive accuracy like never before.
                     </p>
