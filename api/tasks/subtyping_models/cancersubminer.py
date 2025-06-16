@@ -743,7 +743,7 @@ def run_cancersubminer(
             #
             tmp_cluster_target = tmp_cluster[tmp_cluster['Batch'] == "target"]
             tmp_cluster_target_index = tmp_cluster_target.index.tolist()
-            target_y_df.loc[tmp_cluster_target_index, 'new'] = subtype_assigned_to_cluster
+            target_y_df.at[tmp_cluster_target_index, 'new'] = subtype_assigned_to_cluster
         #
         target_pseudo_y_adjusted = target_y_df['new'].values
         target_pseudo_y_adjusted = torch.from_numpy(target_pseudo_y_adjusted)
@@ -917,8 +917,7 @@ def run_cancersubminer(
     prev_loss = 100.0
     for t in range(pt_epochs):
         tmp_loss, tmp_acc = pretrain_classifier(t, train_dataloader, feature_extract_model, subtype_pred_model, c_loss,
-
-                                              fe_optimizer, c_optimizer)
+                                                fe_optimizer, c_optimizer)
 
     # 2. Cluster the source samples based on the subtype
     print("=========================================================")
@@ -936,6 +935,8 @@ def run_cancersubminer(
         for t in range(pt_epochs):
             tmp_loss, tmp_acc = pretrain_classifier(t, train_dataloader, feature_extract_model, subtype_pred_model,
                                                     c_loss, fe_optimizer, c_optimizer)
+            if tmp_acc == 1.0:
+                break
         X_embed_torch, y_torch, X_raw_torch = get_embed(train_dataloader, feature_extract_model, subtype_pred_model)
 
     X_embed_torch, y_torch, X_raw_torch = get_embed(source_dataloader, feature_extract_model, subtype_pred_model)

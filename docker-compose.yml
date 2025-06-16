@@ -51,8 +51,7 @@ services:
     container_name: celery_worker
     build:
       context: ./api
-      args:
-        INSTALL_R: "true"
+      dockerfile: Dockerfile.worker
     working_dir: /app
     command: ["celery", "-A", "celery_config", "worker", "--loglevel=info", "--concurrency=2"]
     volumes:
@@ -69,8 +68,7 @@ services:
     container_name: flower
     build:
       context: ./api
-      args:
-        INSTALL_R: "false"
+      dockerfile: Dockerfile.worker
     working_dir: /app
     command: ["celery", "-A", "celery_config", "flower", "--broker=$(CELERY_BROKER_URL)", "--port=5555"]
     volumes:
