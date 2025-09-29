@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { FaSearch, FaSort, FaSortUp, FaSortDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {chromosomeFormatter} from "../../../../shared/utils/utils.jsx";
 
 const Plot1Table = () => {
     const { plots } = useSelector(state => state.visualization);
@@ -117,15 +118,17 @@ const Plot1Table = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {paginatedData.map((row, index) => (
-                        <tr key={index} className="hover:bg-base-200">
-                            {columns.map(col => (
+                    {paginatedData.map((row, i) => (
+                        <tr key={i} className="hover:bg-base-200">
+                            {columns.map((col) => (
                                 <td
                                     key={col.key}
                                     className={`p-3 ${col.key === "ucsc" ? "max-w-[200px] truncate" : ""}`}
                                     title={row[col.key]}
                                 >
-                                    {row[col.key]}
+                                    {col.key === "chr"
+                                        ? chromosomeFormatter(row[col.key])
+                                        : row[col.key]}
                                 </td>
                             ))}
                         </tr>

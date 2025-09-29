@@ -8,7 +8,7 @@ const ExamplePlot1 = () => {
     const tooltipRef = useRef(null);
 
     useEffect(() => {
-        const points = plots["bc_plot1"];
+        const points = plots["cs_plot1"];
         if (!points || points.length === 0) return;
 
         const data = points;

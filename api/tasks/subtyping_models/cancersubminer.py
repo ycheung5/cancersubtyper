@@ -972,7 +972,7 @@ def run_cancersubminer(
     # tmp_silhouette = silhouette_score(X_embed_torch.detach().cpu().numpy(), y_pred_torch)
     # X_raw, X_embed, y_new, is_new_subtype_identified = cluster_features_for_subtyping(X_embed_torch, y_torch, X_raw_torch)
 
-    # 3. Adversarial traning
+    # 3. Adversarial training
     print("================================")
     print(" [Step 3] Adversarial training")
     print("================================")
@@ -1200,10 +1200,13 @@ def run_cancersubminer(
     # for the batch != Source, their subtype should be Unknown. for the batch == Source, their subtype should be the original
 
     # Generate UMAP for Corrected Data
-    corrected = umap_embed.copy().drop(columns=['Batch', 'Pred_subtype', 'Original_subtype'], errors='ignore')
-    corrected_umap_embedding = reducer.fit_transform(corrected)
-    corrected_umap_df = pd.DataFrame(corrected_umap_embedding, columns=['x', 'y'], index=corrected.index)
-    corrected_umap_df[['Batch', 'subtype']] = X_final_embed[['Batch', 'Pred_subtype']]
+    #corrected = umap_embed.copy().drop(columns=['Batch', 'Pred_subtype', 'Original_subtype'], errors='ignore')
+    #corrected_umap_embedding = reducer.fit_transform(corrected)
+    #corrected_umap_df = pd.DataFrame(corrected_umap_embedding, columns=['x', 'y'], index=corrected.index)
+    #corrected_umap_df[['Batch', 'subtype']] = X_final_embed[['Batch', 'Pred_subtype']]
+    corrected_umap_df = umap_embed.copy()
+    del corrected_umap_df['Original_subtype']
+    corrected_umap_df.columns = ['x', 'y', 'Batch', 'subtype']
     corrected_umap_df.to_csv(os.path.join(result_dir, "corrected_umap_embedding.csv"))
 
     print("Done")

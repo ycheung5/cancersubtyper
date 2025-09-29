@@ -4,6 +4,7 @@ import authReducer from "./redux/authSlice.jsx";
 import projectReducer from "./redux/projectSlice.jsx";
 import jobReducer from "./redux/jobSlice.jsx";
 import visualizationReducer from "./redux/visualizationSlice.jsx";
+import visualizationExampleReducer from "./redux/visualizationExampleSlice.jsx";
 
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
         project: projectReducer,
         job: jobReducer,
         visualization: visualizationReducer,
+        visualizationExample: visualizationExampleReducer
     },
 });
 

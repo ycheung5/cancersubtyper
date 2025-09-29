@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BackToTopButton from "../components/BackToTopButton";
-import { RouteConstants } from "../shared/constants/RouteConstants";
+import BackToTopButton from "../../components/BackToTopButton.jsx";
+import { RouteConstants } from "../../shared/constants/RouteConstants.js";
 
 // Example containers
-import BCTyperFinderExample from "../components/visualization/examples/BCTyperFinderExample.jsx";
+import BCTyperFinderExample from "../../components/visualization/examples/BCTyperFinderExample.jsx";
 // import CancerSubminerExample from "../components/visualization/examples/CancerSubminerExample.jsx";
 
 const ExampleVisualization = () => {
@@ -22,14 +22,21 @@ const ExampleVisualization = () => {
                     <ul>
                         <li>
                             <a
-                                onClick={() => navigate(RouteConstants.dashboard)}
+                                onClick={() => navigate(RouteConstants.demoDashboard)}
                                 className="cursor-pointer text-primary"
                             >
-                                Dashboard
+                                Demo Dashboard
                             </a>
                         </li>
-                        <li className="text-base-content">Examples</li>
-                        <li className="text-base-content">Visualization</li>
+                        <li>
+                            <a
+                                onClick={() => navigate(RouteConstants.demoProject)}
+                                className="cursor-pointer text-primary"
+                            >
+                                Demo Project
+                            </a>
+                        </li>
+                        <li className="text-base-content">Demo Visualization</li>
                     </ul>
                 </div>
 

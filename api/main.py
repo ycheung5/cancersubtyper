@@ -9,7 +9,7 @@ from routers.auth import router as auth_router
 from routers.users import router as users_router
 from routers.projects import router as projects_router
 from routers.jobs import router as jobs_router
-from routers.visualization import router as visualization_router
+from routers.visualization import router as visualization_router, examples_router as visualization_examples_router
 
 
 @asynccontextmanager
@@ -46,6 +46,9 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(projects_router)
 app.include_router(jobs_router)
+
+app.include_router(visualization_examples_router)
+
 app.include_router(visualization_router)
 
 

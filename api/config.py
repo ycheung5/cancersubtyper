@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     # Global File
     cpg_info_file: str = os.getenv("CPG_INFO_FILE", "/app/data/cpg_info.csv")
     nemo_script_file: str = os.getenv("NEMO_SCRIPT_FILE", "/app/tasks/helper_scripts/run_nemo.R")
+    sample_file: str = os.getenv("SAMPLE_FILE", "/app/data/global/sample")
 
     # Celery & Redis Configuration
     celery_broker_url: str = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")

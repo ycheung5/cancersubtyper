@@ -96,13 +96,19 @@ const UploadSample = ({ projectId, onClose }) => {
                 </div>
 
                 <div className="space-y-4">
+                    <div className="alert alert-info">
+                        <p className="text-sm">
+                            <strong>Note:</strong> Files must be compressed in .gz format. Use the template buttons to download CSV templates, then compress them with gzip before uploading.
+                        </p>
+                    </div>
+                    
                     <div
                         className={`p-6 border-2 border-dashed border-base-300 rounded-lg flex flex-col items-center justify-center ${loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-base-200 transition"}`}
                         onDragOver={(e) => !loading && handleDragOver(e)}
                         onDrop={(e) => !loading && handleDrop(e, "source")}
                     >
                         <FaFileUpload className="text-primary text-4xl mb-2" />
-                        <p className="text-base-content text-center">Drag & drop your <strong>Source File</strong> here</p>
+                        <p className="text-base-content text-center">Drag & drop your <strong>Source File (.gz)</strong> here</p>
                         <input
                             type="file"
                             className="hidden"
@@ -123,7 +129,7 @@ const UploadSample = ({ projectId, onClose }) => {
                         onDrop={(e) => !loading && handleDrop(e, "target")}
                     >
                         <FaFileUpload className="text-primary text-4xl mb-2" />
-                        <p className="text-base-content text-center">Drag & drop your <strong>Target File</strong> here</p>
+                        <p className="text-base-content text-center">Drag & drop your <strong>Target File (.gz)</strong> here</p>
                         <input
                             type="file"
                             className="hidden"

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash, FaFileUpload, FaFileCsv, FaClock, FaCalendarAlt } from "react-icons/fa";
+import { FaEdit, FaTrash, FaFileUpload, FaFileCsv, FaClock, FaCalendarAlt, FaDownload } from "react-icons/fa";
 import { MdCheckCircle, MdCancel } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../../redux/toastSlice.jsx";
@@ -24,6 +24,28 @@ const ProjectDetail = ({ project }) => {
             .unwrap()
             .then(() => dispatch(showToast({ message: "Metadata uploaded successfully", type: "success" })))
             .catch((err) => dispatch(showToast({ message: err || "Upload failed", type: "error" })));
+    };
+
+    const handleGetTemplate = () => {
+        // Create CSV template content
+        const csvContent = "sample_id,os_time,status\n" +
+            "sample_001,365,1\n" +
+            "sample_002,180,2\n" +
+            "sample_003,730,1";
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'metadata_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     };
 
     const deleteProjectHandler = () => {
@@ -120,6 +142,14 @@ const ProjectDetail = ({ project }) => {
                         onChange={handleMetadataUpload}
                         disabled={used}
                     />
+                    
+                    <button
+                        className="btn btn-outline btn-info flex items-center"
+                        onClick={handleGetTemplate}
+                    >
+                        <FaDownload className="mr-2" />
+                        <span>Get Template</span>
+                    </button>
 
                     {project.metadata_file ? (
                         <div className="flex items-center gap-2 text-green-500">

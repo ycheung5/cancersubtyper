@@ -12,6 +12,9 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Project from "./pages/Project.jsx";
 import Visualization from "./pages/Visualization.jsx";
+import ExampleVisualization from "./pages/demo/ExampleVisualization.jsx";
+import DemoDashboard from "./pages/demo/DemoDashboard.jsx";
+import DemoProject from "./pages/demo/DemoProject.jsx";
 
 const App = () => {
     const dispatch = useDispatch();
@@ -39,6 +42,9 @@ const App = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route path={RouteConstants.visualizationExamples} element={<ExampleVisualization />}/>
+                <Route path={RouteConstants.demoDashboard} element={<DemoDashboard />}/>
+                <Route path={RouteConstants.demoProject} element={<DemoProject />}/>
                 <Route
                     path={`${RouteConstants.project}/:id`}
                     element={

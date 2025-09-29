@@ -5,4 +5,7 @@ export const RouteConstants = {
     dashboard: "/dashboard",
     project: "/project",
     visualization: "visualization",
+    demoDashboard: "/demoDashboard",
+    demoProject: "/demoProject",
+    visualizationExamples: "/visualizationExamples",
 }

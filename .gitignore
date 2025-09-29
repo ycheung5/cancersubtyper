@@ -1,1 +1,53 @@
-api/data/
+# Root level gitignore for cancersubtyper project
+
+# API data directories (user-specific data should not be committed)
+api/data/user_*/
+api/uploads/
+api/downloads/
+api/cache/
+api/logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+api/.env
+api/.env.local
+api/.env.*.local
+app/.env
+app/.env.local
+app/.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+
+# Backup files
+*.bak
+*.backup
+*.orig

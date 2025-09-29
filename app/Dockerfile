@@ -1,4 +1,4 @@
-# ✅ Use Node.js 20+ for latest TailwindCSS/DaisyUI support
+# Use Node.js 20+ for latest TailwindCSS/DaisyUI support
 FROM node:20-alpine
 
 # Set working directory inside the container

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { FaSearch, FaSort, FaSortUp, FaSortDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {chromosomeFormatter} from "../../../../../shared/utils/utils.jsx";
 
 const ExamplePlot1Table = () => {
     const plots = useSelector((s) => s.visualizationExample.plots);
@@ -119,7 +120,9 @@ const ExamplePlot1Table = () => {
                                     className={`p-3 ${col.key === "ucsc" ? "max-w-[200px] truncate" : ""}`}
                                     title={row[col.key]}
                                 >
-                                    {row[col.key]}
+                                    {col.key === "chr"
+                                        ? chromosomeFormatter(row[col.key])
+                                        : row[col.key]}
                                 </td>
                             ))}
                         </tr>

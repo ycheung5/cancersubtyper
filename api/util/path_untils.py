@@ -90,3 +90,22 @@ def delete_directory(path: str):
     """
     if os.path.exists(path):
         shutil.rmtree(path)
+
+
+def example_base_dir() -> str:
+    """
+    Returns the base directory for example assets from settings.sample_file.
+    If SAMPLE_FILE is a file path, use its parent directory.
+    """
+    base = settings.sample_file
+    # If points to a file (or something not a dir), fallback to dirname
+    if not os.path.isdir(base):
+        base = os.path.dirname(base)
+    return base
+
+def example_result_path(model: str) -> str:
+    """
+    /app/data/global/sample/<model>
+      where model ∈ {bctypefinder, cancersubminer}
+    """
+    return os.path.join(example_base_dir(), model)

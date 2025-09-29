@@ -21,9 +21,11 @@ from schemas.visualization import (
     HeatmapPlotTableResponse, KMPlotResult, DistributionBoxPlotOptionResponse,
     CancerSubminerKMeanPlotResponse, CancerSubminerNemoPlotResponse, CancerSubminerComparisonTableResponse
 )
-from util.path_untils import job_result_path
+from util.path_untils import job_result_path, example_result_path
 
 router = APIRouter(prefix="/visualization", tags=["visualization"])
+
+examples_router = APIRouter(prefix="/visualization/examples", tags=["visualization-examples"])
 
 
 def get_result_path(job_id: int, db: Session):
@@ -402,3 +404,199 @@ async def get_cancersubminer_plot5_options(job_id: int, db: Session = Depends(ge
 async def get_cancersubminer_plot5(job_id: int, batch: str, db: Session = Depends(get_db),
                                  current_user: User = Depends(get_current_user)):
     return km_plot(job_id, batch, db)
+
+
+def _correlation_heatmap_options_from_dir(base_dir: str):
+    print('aaa')
+    file_path = os.path.join(base_dir, "preprocessed_dataset.csv")
+    all_sample_df = load_csv_or_raise(file_path)
+    if "Batch" not in all_sample_df.columns or "subtype" not in all_sample_df.columns:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Required columns not found in dataset.")
+    batch_subtypes = all_sample_df.groupby('Batch')['subtype'].apply(lambda x: list(set(x))).to_dict()
+    all_subtypes = list(set(all_sample_df["subtype"]))
+    return OrderedDict([("All", all_subtypes)] + list(batch_subtypes.items()))
+
+def _correlation_heatmap_from_dir(base_dir: str, batch: str, subtype: str):
+    file_path = os.path.join(base_dir, f"{batch}_{subtype}_heatmap.csv")
+    heatmap_df = load_csv_or_raise(file_path)
+    long_df = heatmap_df.melt(ignore_index=False, var_name="colLabel", value_name="valueLabel").reset_index()
+    long_df.rename(columns={"index": "rowLabel"}, inplace=True)
+    return [
+        HeatmapPlotResponse(rowLabel=f"CpG Cluster {r}", colLabel=f"CpG Cluster {c}", valueLabel=float(v))
+        for r, c, v in long_df.itertuples(index=False)
+    ]
+
+def _correlation_heatmap_table_from_dir(base_dir: str, clusters: str):
+    file_path = os.path.join(base_dir, "cpg_info_table.csv")
+    cpg_info_df = load_csv_or_raise(file_path, False)
+    if "cluster" not in cpg_info_df.columns:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Cluster column missing in dataset.")
+    cluster_list = [c.strip() for c in clusters.split(",")]
+    cpg_info_df["cluster"] = cpg_info_df["cluster"].astype(str)
+    filtered = cpg_info_df[cpg_info_df["cluster"].isin(cluster_list)]
+    return [
+        HeatmapPlotTableResponse(
+            cluster=str(row.cluster), cpg=str(row.CpG), chr=str(row.CHR),
+            position=str(row.Position), strand=str(row.Strand),
+            ucsc=str(row.UCSC_RefGene_Name) if pd.notna(row.UCSC_RefGene_Name) else None,
+            genome=str(row.Genome_Build),
+        )
+        for row in filtered.itertuples(index=False)
+    ]
+
+def _distribution_boxplot_options_from_dir(base_dir: str):
+    file_path = os.path.join(base_dir, "preprocessed_dataset.csv")
+    df = load_csv_or_raise(file_path)
+    cols = list(df.columns)
+    for c in ["Batch", "subtype"]:
+        if c in cols: cols.remove(c)
+    batches = df["Batch"].unique().tolist()
+    return DistributionBoxPlotOptionResponse(batches=batches, cpg_groups=cols)
+
+def _distribution_boxplot_from_dir(base_dir: str, option: str, batch: str):
+    file_path = os.path.join(base_dir, "preprocessed_dataset.csv")
+    df = load_csv_or_raise(file_path)
+    if option not in df.columns:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=f"CpG Cluster '{option}' not found in dataset.")
+    if batch != "All":
+        df = df[df["Batch"] == batch]
+    return [DistributionBoxPlotResponse(batch=r["Batch"], subtype=r["subtype"], value=r[option]) for _, r in df.iterrows()]
+
+def _umap_plot_from_dir(base_dir: str, option: str, filter_source: bool = False):
+    if option not in ["corrected", "uncorrected"]:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=f"Invalid option '{option}'")
+    file_path = os.path.join(base_dir, f"{option}_umap_embedding.csv")
+    df = load_csv_or_raise(file_path)
+    if filter_source:
+        df = df[df["Batch"] == "Source"]
+    return [UMAPPlotResponse(sample_id=str(i), x=r.x, y=r.y, batch=r.Batch, subtype=r.subtype) for i, r in df.iterrows()]
+
+def _km_plot_options_from_dir(base_dir: str):
+    file_path = os.path.join(base_dir, "km_plot_data.csv")
+    df = load_csv_or_raise(file_path)
+    return df["Batch"].unique().tolist()
+
+def _km_plot_from_dir(base_dir: str, batch: str):
+    file_path = os.path.join(base_dir, "km_plot_data.csv")
+    df = load_csv_or_raise(file_path)
+    df = df[df["Batch"] == batch]
+    df["OS_time"] = pd.to_numeric(df["OS_time"], errors="coerce")
+    df["OS_event"] = pd.to_numeric(df["OS_event"], errors="coerce")
+    df.dropna(subset=["OS_time", "OS_event"], inplace=True)
+    subtypes = df["Label_subtype"].unique()
+    mapping = {s: i for i, s in enumerate(subtypes)}
+    df["Subtype_Label"] = df["Label_subtype"].map(mapping)
+    if len(subtypes) >= 2:
+        results = multivariate_logrank_test(df["OS_time"].values, df["Subtype_Label"].values, df["OS_event"].values)
+        p_value = float(results.p_value) if not np.isnan(results.p_value) else 1.0
+    else:
+        p_value = None
+    return KMPlotResult(
+        data=[KMPlotResponse(sample_id=str(i), os_time=r["OS_time"], os_event=r["OS_event"], subtype=r["Label_subtype"])
+              for i, r in df.iterrows()],
+        p_value=p_value
+    )
+
+# ----- change all example routes to use `examples_router` -----
+@examples_router.get("/bctypefinder/plot1-options", response_model=Dict[str, List[str]])
+async def example_bctypefinder_plot1_options():
+    return _correlation_heatmap_options_from_dir(example_result_path("bctypefinder"))
+
+@examples_router.get("/bctypefinder/plot1/{batch}/{subtype}", response_model=List[HeatmapPlotResponse])
+async def example_bctypefinder_plot1(batch: str, subtype: str):
+    return _correlation_heatmap_from_dir(example_result_path("bctypefinder"), batch, subtype)
+
+@examples_router.get("/bctypefinder/plot1-table/{clusters}", response_model=List[HeatmapPlotTableResponse])
+async def example_bctypefinder_plot1_table(clusters: str):
+    return _correlation_heatmap_table_from_dir(example_result_path("bctypefinder"), clusters)
+
+@examples_router.get("/bctypefinder/plot2-options", response_model=DistributionBoxPlotOptionResponse)
+async def example_bctypefinder_plot2_options():
+    return _distribution_boxplot_options_from_dir(example_result_path("bctypefinder"))
+
+@examples_router.get("/bctypefinder/plot2/{option}/{batch}", response_model=List[DistributionBoxPlotResponse])
+async def example_bctypefinder_plot2(option: str, batch: str):
+    return _distribution_boxplot_from_dir(example_result_path("bctypefinder"), option, batch)
+
+@examples_router.get("/bctypefinder/plot3/{option}", response_model=List[UMAPPlotResponse])
+async def example_bctypefinder_plot3(option: str):
+    return _umap_plot_from_dir(example_result_path("bctypefinder"), option)
+
+@examples_router.get("/bctypefinder/plot4-table", response_model=List[BCtypeFinderComparisonTableResponse])
+async def example_bctypefinder_plot4_table():
+    base = example_result_path("bctypefinder")
+    df = load_csv_or_raise(os.path.join(base, "result_comparison_ml.csv"))
+    return [BCtypeFinderComparisonTableResponse(
+        sample_id=str(i), batch=r["Batch"],
+        bctypefinder=r["BCtypeFinder"] if pd.notna(r["BCtypeFinder"]) else None,
+        svm=r["SVM"] if pd.notna(r["SVM"]) else None,
+        rf=r["RF"] if pd.notna(r["RF"]) else None,
+        lr=r["LogReg"] if pd.notna(r["LogReg"]) else None
+    ) for i, r in df.iterrows()]
+
+@examples_router.get("/bctypefinder/plot5-options", response_model=List[str])
+async def example_bctypefinder_plot5_options():
+    return _km_plot_options_from_dir(example_result_path("bctypefinder"))
+
+@examples_router.get("/bctypefinder/plot5/{batch}", response_model=KMPlotResult)
+async def example_bctypefinder_plot5(batch: str):
+    return _km_plot_from_dir(example_result_path("bctypefinder"), batch)
+
+# CancerSubminer examples (same pattern)
+@examples_router.get("/cancersubminer/plot1-options", response_model=Dict[str, List[str]])
+async def example_cancersubminer_plot1_options():
+    return _correlation_heatmap_options_from_dir(example_result_path("cancersubminer"))
+
+@examples_router.get("/cancersubminer/plot1/{batch}/{subtype}", response_model=List[HeatmapPlotResponse])
+async def example_cancersubminer_plot1(batch: str, subtype: str):
+    return _correlation_heatmap_from_dir(example_result_path("cancersubminer"), batch, subtype)
+
+@examples_router.get("/cancersubminer/plot1-table/{clusters}", response_model=List[HeatmapPlotTableResponse])
+async def example_cancersubminer_plot1_table(clusters: str):
+    return _correlation_heatmap_table_from_dir(example_result_path("cancersubminer"), clusters)
+
+@examples_router.get("/cancersubminer/plot2-options", response_model=DistributionBoxPlotOptionResponse)
+async def example_cancersubminer_plot2_options():
+    return _distribution_boxplot_options_from_dir(example_result_path("cancersubminer"))
+
+@examples_router.get("/cancersubminer/plot2/{option}/{batch}", response_model=List[DistributionBoxPlotResponse])
+async def example_cancersubminer_plot2(option: str, batch: str):
+    return _distribution_boxplot_from_dir(example_result_path("cancersubminer"), option, batch)
+
+@examples_router.get("/cancersubminer/plot3/{option}", response_model=List[UMAPPlotResponse])
+async def example_cancersubminer_plot3(option: str):
+    return _umap_plot_from_dir(example_result_path("cancersubminer"), option, filter_source=(option == "uncorrected"))
+
+@examples_router.get("/cancersubminer/plot3-kmean", response_model=List[CancerSubminerKMeanPlotResponse])
+async def example_cancersubminer_plot3_kmean():
+    base = example_result_path("cancersubminer")
+    kmeans = pd.read_csv(os.path.join(base, "kmeans.csv"), index_col=0)
+    umap = pd.read_csv(os.path.join(base, "uncorrected_umap_embedding.csv"), index_col=0).drop(columns=["subtype"])
+    merged = umap.join(kmeans).rename(columns={"Cluster": "subtype"})
+    return [CancerSubminerKMeanPlotResponse(sample_id=str(i), x=r.x, y=r.y, batch=r.Batch, subtype=r.subtype)
+            for i, r in merged.iterrows()]
+
+@examples_router.get("/cancersubminer/plot3-nemo", response_model=List[CancerSubminerNemoPlotResponse])
+async def example_cancersubminer_plot3_nemo():
+    base = example_result_path("cancersubminer")
+    nemo = pd.read_csv(os.path.join(base, "nemo.csv"), index_col=0)
+    umap = pd.read_csv(os.path.join(base, "uncorrected_umap_embedding.csv"), index_col=0).drop(columns=["subtype"])
+    merged = umap.join(nemo).rename(columns={"Subtype": "subtype"})
+    return [CancerSubminerKMeanPlotResponse(sample_id=str(i), x=r.x, y=r.y, batch=r.Batch, subtype=r.subtype)
+            for i, r in merged.iterrows()]
+
+@examples_router.get("/cancersubminer/plot4-table", response_model=List[CancerSubminerComparisonTableResponse])
+async def example_cancersubminer_plot4_table():
+    base = example_result_path("cancersubminer")
+    df = load_csv_or_raise(os.path.join(base, "result_comparison_ml.csv"))
+    return [CancerSubminerComparisonTableResponse(
+        sample_id=str(i), batch=r["Batch"], cancersubminer=r["CancerSubminer"], kmean=r["KMeans"], nemo=r["NeMo"]
+    ) for i, r in df.iterrows()]
+
+@examples_router.get("/cancersubminer/plot5-options", response_model=List[str])
+async def example_cancersubminer_plot5_options():
+    return _km_plot_options_from_dir(example_result_path("cancersubminer"))
+
+@examples_router.get("/cancersubminer/plot5/{batch}", response_model=KMPlotResult)
+async def example_cancersubminer_plot5(batch: str):
+    return _km_plot_from_dir(example_result_path("cancersubminer"), batch)

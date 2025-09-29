@@ -1,8 +1,8 @@
 import React from "react";
-import heroBg from "../assets/hero-bg.png";
+import heroBg from "../../assets/hero-bg.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { RouteConstants } from "../shared/constants/RouteConstants.js";
+import { RouteConstants } from "../../shared/constants/RouteConstants.js";
 
 const Hero = () => {
     const navigate = useNavigate();
@@ -10,17 +10,18 @@ const Hero = () => {
 
     const handleLoginClick = () => navigate(RouteConstants.login);
     const handleDashboardClick = () => navigate(RouteConstants.dashboard);
+    const handleDemoClick = () => navigate(RouteConstants.demoDashboard); // NEW
 
     return (
         <div
-            className="hero min-h-screen flex items-center justify-center"
+            className="hero h-screen flex items-center justify-center"
             style={{
                 backgroundImage: `url(${heroBg})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
             }}
         >
-            <div className="hero-overlay absolute inset-0"></div>
+            <div className="hero-overlay absolute"></div>
 
             <div className="hero-content text-center text-neutral-content relative z-10">
                 <div className="max-w-3xl">
@@ -34,7 +35,7 @@ const Hero = () => {
                         Gain precise insights and advance predictive accuracy like never before.
                     </p>
 
-                    <div className="flex justify-center space-x-4">
+                    <div className="flex justify-center flex-wrap gap-4">
                         {!user ? (
                             <button
                                 onClick={handleLoginClick}
@@ -52,6 +53,16 @@ const Hero = () => {
                         )}
 
                         <button
+                            onClick={handleDemoClick}
+                            className="btn btn-accent btn-lg px-6 transition duration-300 transform hover:scale-105"
+                        >
+                            Try Demo
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                document.getElementById("model-structure")?.scrollIntoView({ behavior: "smooth" });
+                            }}
                             className="btn btn-outline btn-secondary btn-lg px-6 transition duration-300 transform hover:scale-105"
                         >
                             Learn More

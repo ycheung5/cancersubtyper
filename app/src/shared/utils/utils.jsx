@@ -59,3 +59,15 @@ export const capitalizeFirstLetter = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const chromosomeFormatter = (chromosome) => {
+    const num = Number(chromosome);
+
+    // If conversion fails (NaN), return original
+    if (isNaN(num)) {
+        return chromosome;
+    }
+
+    // If conversion works, round it
+    return String(Math.round(num));
+};
