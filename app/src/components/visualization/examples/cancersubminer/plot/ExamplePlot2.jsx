@@ -4,13 +4,12 @@ import * as d3 from "d3";
 
 const ExamplePlot2 = () => {
     const plots = useSelector((s) => s.visualizationExample.plots);
-    const data = useMemo(() => plots["bc_plot2"] || [], [plots]);
-
     const svgRef = useRef();
     const tooltipRef = useRef(null);
+    const data = useMemo(() => plots["cs_plot2"] || [], [plots]);
 
     useEffect(() => {
-        if (!data.length) return;
+        if (data.length === 0) return;
 
         const margin = { top: 50, right: 200, bottom: 100, left: 90 };
         const width = 800 - margin.left - margin.right;
@@ -18,17 +17,16 @@ const ExamplePlot2 = () => {
 
         d3.select(svgRef.current).selectAll("*").remove();
 
-        const svg = d3
-            .select(svgRef.current)
+        const svg = d3.select(svgRef.current)
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        const grouped = d3.group(data, (d) => d.subtype);
+        const groupedData = d3.group(data, d => d.subtype);
 
-        const boxData = Array.from(grouped, ([subtype, values]) => {
-            const sorted = values.map((d) => d.value).sort(d3.ascending);
+        const boxData = Array.from(groupedData, ([subtype, values]) => {
+            const sorted = values.map(d => d.value).sort(d3.ascending);
             const q1 = d3.quantile(sorted, 0.25);
             const median = d3.quantile(sorted, 0.5);
             const q3 = d3.quantile(sorted, 0.75);
@@ -40,35 +38,34 @@ const ExamplePlot2 = () => {
                 min: d3.min(sorted),
                 max: d3.max(sorted),
                 values,
-                count: values.length,
+                count: values.length
             };
         });
 
-        const x = d3.scaleBand().domain(boxData.map((d) => d.subtype)).range([0, width]).padding(0.2);
-        const y = d3
-            .scaleLinear()
-            .domain([0, d3.max(data, (d) => d.value)])
+        const xScale = d3.scaleBand()
+            .domain(boxData.map(d => d.subtype))
+            .range([0, width])
+            .padding(0.2);
+
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
             .nice()
             .range([height, 0]);
 
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-        // axes
-        svg
-            .append("g")
+        svg.append("g")
             .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x))
+            .call(d3.axisBottom(xScale))
             .selectAll("text")
             .attr("transform", "rotate(-25)")
             .style("text-anchor", "end");
 
-        svg.append("g").call(d3.axisLeft(y).ticks(6));
+        svg.append("g")
+            .call(d3.axisLeft(yScale).ticks(6));
 
-        // tooltip
         if (!tooltipRef.current) {
-            tooltipRef.current = d3
-                .select("body")
-                .append("div")
+            tooltipRef.current = d3.select("body").append("div")
                 .attr("class", "tooltip")
                 .style("position", "absolute")
                 .style("pointer-events", "none")
@@ -81,115 +78,108 @@ const ExamplePlot2 = () => {
                 .style("display", "none")
                 .style("z-index", "1000");
         }
+
         const tooltip = tooltipRef.current;
 
-        // boxes
-        svg
-            .selectAll(".box")
+        svg.selectAll(".box")
             .data(boxData)
             .enter()
             .append("rect")
-            .attr("x", (d) => x(d.subtype))
-            .attr("y", (d) => y(d.q3))
-            .attr("width", x.bandwidth())
-            .attr("height", (d) => y(d.q1) - y(d.q3))
-            .attr("fill", (d) => color(d.subtype))
+            .attr("x", d => xScale(d.subtype))
+            .attr("y", d => yScale(d.q3))
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => yScale(d.q1) - yScale(d.q3))
+            .attr("fill", d => colorScale(d.subtype))
             .attr("stroke", "black")
             .on("mouseover", function (event, d) {
-                tooltip
-                    .style("display", "block")
+                tooltip.style("display", "block")
                     .style("left", `${event.pageX + 10}px`)
                     .style("top", `${event.pageY - 10}px`)
-                    .html(
-                        `<strong>Subtype:</strong> ${d.subtype}<br/>
-             <strong>n:</strong> ${d.count}<br/>
-             <strong>Q1:</strong> ${d.q1.toFixed(2)}<br/>
-             <strong>Median:</strong> ${d.median.toFixed(2)}<br/>
-             <strong>Q3:</strong> ${d.q3.toFixed(2)}`
-                    );
+                    .html(`<strong>Subtype:</strong> ${d.subtype}<br/>
+                           <strong>n:</strong> ${d.count}<br/>
+                           <strong>Q1:</strong> ${d.q1.toFixed(2)}<br/>
+                           <strong>Median:</strong> ${d.median.toFixed(2)}<br/>
+                           <strong>Q3:</strong> ${d.q3.toFixed(2)}`);
                 d3.select(this).attr("stroke-width", 2);
             })
-            .on("mousemove", (event) => {
-                tooltip.style("left", `${event.pageX + 10}px`).style("top", `${event.pageY - 10}px`);
+            .on("mousemove", event => {
+                tooltip.style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY - 10}px`);
             })
             .on("mouseout", function () {
                 tooltip.style("display", "none");
                 d3.select(this).attr("stroke-width", 1);
             });
 
-        // median line
-        svg
-            .selectAll(".median-line")
+        svg.selectAll(".median-line")
             .data(boxData)
             .enter()
             .append("line")
-            .attr("x1", (d) => x(d.subtype))
-            .attr("x2", (d) => x(d.subtype) + x.bandwidth())
-            .attr("y1", (d) => y(d.median))
-            .attr("y2", (d) => y(d.median))
+            .attr("x1", d => xScale(d.subtype))
+            .attr("x2", d => xScale(d.subtype) + xScale.bandwidth())
+            .attr("y1", d => yScale(d.median))
+            .attr("y2", d => yScale(d.median))
             .attr("stroke", "black")
             .attr("stroke-width", 2);
 
-        // whiskers + caps
-        svg
-            .selectAll(".whiskers")
+        svg.selectAll(".whiskers")
             .data(boxData)
             .enter()
             .append("g")
             .each(function (d) {
-                const xMid = x(d.subtype) + x.bandwidth() / 2;
-                const capW = x.bandwidth() / 2.5;
+                const xMid = xScale(d.subtype) + xScale.bandwidth() / 2;
+                const capW = xScale.bandwidth() / 2.5;
 
-                d3.select(this)
-                    .append("line")
-                    .attr("x1", xMid)
-                    .attr("x2", xMid)
-                    .attr("y1", y(d.min))
-                    .attr("y2", y(d.q1))
+                d3.select(this).append("line")
+                    .attr("x1", xMid).attr("x2", xMid)
+                    .attr("y1", yScale(d.min)).attr("y2", yScale(d.q1))
                     .attr("stroke", "black");
 
-                d3.select(this)
-                    .append("line")
-                    .attr("x1", xMid)
-                    .attr("x2", xMid)
-                    .attr("y1", y(d.q3))
-                    .attr("y2", y(d.max))
+                d3.select(this).append("line")
+                    .attr("x1", xMid).attr("x2", xMid)
+                    .attr("y1", yScale(d.q3)).attr("y2", yScale(d.max))
                     .attr("stroke", "black");
 
-                d3.select(this)
-                    .append("line")
-                    .attr("x1", xMid - capW / 2)
-                    .attr("x2", xMid + capW / 2)
-                    .attr("y1", y(d.min))
-                    .attr("y2", y(d.min))
+                d3.select(this).append("line")
+                    .attr("x1", xMid - capW / 2).attr("x2", xMid + capW / 2)
+                    .attr("y1", yScale(d.min)).attr("y2", yScale(d.min))
                     .attr("stroke", "black");
 
-                d3.select(this)
-                    .append("line")
-                    .attr("x1", xMid - capW / 2)
-                    .attr("x2", xMid + capW / 2)
-                    .attr("y1", y(d.max))
-                    .attr("y2", y(d.max))
+                d3.select(this).append("line")
+                    .attr("x1", xMid - capW / 2).attr("x2", xMid + capW / 2)
+                    .attr("y1", yScale(d.max)).attr("y2", yScale(d.max))
                     .attr("stroke", "black");
             });
 
-        // legend
         const legend = svg.append("g").attr("transform", `translate(${width + 30}, 10)`);
-        boxData.forEach((d, i) => {
+
+        boxData
+            .sort((a, b) => a.subtype.localeCompare(b.subtype))
+            .forEach((d, i) => {
             const yOffset = i * 25;
-            const g = legend
-                .append("g")
+
+            const legendGroup = legend.append("g")
                 .attr("transform", `translate(0, ${yOffset})`)
                 .style("cursor", "pointer")
                 .on("mouseover", () => {
-                    svg.selectAll("rect").style("opacity", (b) => (b.subtype === d.subtype ? 1 : 0.2));
+                    svg.selectAll(".box").style("opacity", b => b.subtype === d.subtype ? 1 : 0.2);
                 })
                 .on("mouseout", () => {
-                    svg.selectAll("rect").style("opacity", 1);
+                    svg.selectAll(".box").style("opacity", 1);
                 });
 
-            g.append("circle").attr("cx", 0).attr("cy", 6).attr("r", 6).attr("fill", color(d.subtype));
-            g.append("text").attr("x", 15).attr("y", 10).text(`${d.subtype} (n = ${d.count})`).attr("font-size", "12px");
+            legendGroup.append("circle")
+                .attr("cx", 0)
+                .attr("cy", 6)
+                .attr("r", 6)
+                .attr("fill", colorScale(d.subtype));
+
+            legendGroup.append("text")
+                .attr("x", 15)
+                .attr("y", 10)
+                .text(`${d.subtype} (n = ${d.count})`)
+                .attr("font-size", "12px")
+                .attr("fill", "#000");
         });
 
         return () => {
@@ -198,7 +188,7 @@ const ExamplePlot2 = () => {
         };
     }, [data]);
 
-    return <svg ref={svgRef} id="bc-example-plot2"></svg>;
+    return <svg ref={svgRef} id="cs-example-plot2"></svg>;
 };
 
 export default ExamplePlot2;

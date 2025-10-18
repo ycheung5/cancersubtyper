@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    getBCExamplePlot2Option,
-    getBCExamplePlot2,
+    getCSExamplePlot2Option,
+    getCSExamplePlot2,
 } from "../../../../../redux/visualizationExampleSlice.jsx";
 import ExamplePlot2 from "../plot/ExamplePlot2.jsx";
 import { FaChartBar, FaFilter, FaSyncAlt } from "react-icons/fa";
@@ -10,7 +10,7 @@ import { downloadPNG, downloadSVG } from "../../../../../shared/utils/downloadPl
 
 const ExampleFigure2 = () => {
     const dispatch = useDispatch();
-    const { bc_plot2_option, bc_plot2 } = useSelector(
+    const { cs_plot2_option, cs_plot2 } = useSelector(
         (s) => s.visualizationExample.plots
     );
 
@@ -21,44 +21,44 @@ const ExampleFigure2 = () => {
     // Fetch available clusters/batches (example)
     useEffect(() => {
         setLoading(true);
-        dispatch(getBCExamplePlot2Option())
+        dispatch(getCSExamplePlot2Option())
             .unwrap()
-            .catch((e) => console.error("Error fetching BCExamplePlot2Option:", e))
+            .catch(error => console.error("Error fetching CSPlot2Option:", error))
             .finally(() => setLoading(false));
     }, [dispatch]);
 
     // Auto-select first cluster
     useEffect(() => {
-        if (bc_plot2_option?.cpg_groups?.length) {
-            setSelectedCluster((prev) => prev || bc_plot2_option.cpg_groups[0]);
+        if (cs_plot2_option?.cpg_groups && cs_plot2_option.cpg_groups.length > 0) {
+            setSelectedCluster(cs_plot2_option.cpg_groups[0]);
         }
-    }, [bc_plot2_option?.cpg_groups]);
+    }, [cs_plot2_option]);
 
-    // Fetch plot data when selection changes (example)
+    // Fetch plot data when a cluster is selected
     useEffect(() => {
-        if (!selectedCluster) return;
-        setLoading(true);
-        dispatch(getBCExamplePlot2({ option: selectedCluster, batch: selectedBatch }))
-            .unwrap()
-            .catch((e) => console.error("Error fetching BCExamplePlot2:", e))
-            .finally(() => setLoading(false));
+        if (selectedCluster) {
+            setLoading(true);
+            dispatch(getCSExamplePlot2({ option: selectedCluster, batch: selectedBatch }))
+                .unwrap()
+                .catch(error => console.error("Error fetching CSPlot2:", error))
+                .finally(() => setLoading(false));
+        }
     }, [dispatch, selectedCluster, selectedBatch]);
 
     return (
         <div className="bg-base-200 p-6 rounded-lg shadow-md border border-base-300 mt-5">
-            {/* Title */}
+            {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Beta Value Distribution (Example)
+                CpG Cluster Visualization
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-                Explore the distribution of beta values for a CpG cluster using bundled example data.
-                Filter by cluster and (optionally) restrict to a single batch.
+                Select a CpG Cluster to visualize its distribution across subtypes and batches.
             </p>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 items-center bg-base-100 p-4 rounded-lg shadow-sm border border-base-300">
-                {/* Cluster */}
+                {/* Cluster Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Cluster:
@@ -69,8 +69,8 @@ const ExampleFigure2 = () => {
                     onChange={(e) => setSelectedCluster(e.target.value)}
                     disabled={loading}
                 >
-                    {bc_plot2_option?.cpg_groups?.length ? (
-                        bc_plot2_option.cpg_groups.map((cluster) => (
+                    {cs_plot2_option?.cpg_groups && cs_plot2_option.cpg_groups.length > 0 ? (
+                        cs_plot2_option.cpg_groups.map((cluster) => (
                             <option key={cluster} value={cluster}>
                                 CpG Cluster {cluster}
                             </option>
@@ -80,7 +80,7 @@ const ExampleFigure2 = () => {
                     )}
                 </select>
 
-                {/* Batch */}
+                {/* Batch Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Batch:
@@ -91,15 +91,11 @@ const ExampleFigure2 = () => {
                     onChange={(e) => setSelectedBatch(e.target.value)}
                     disabled={loading}
                 >
-                    {bc_plot2_option?.batches?.length ? (
+                    {cs_plot2_option?.batches && cs_plot2_option.batches.length > 0 ? (
                         <>
-                            <option key="All" value="All">
-                                All
-                            </option>
-                            {bc_plot2_option.batches.map((b) => (
-                                <option key={b} value={b}>
-                                    {b}
-                                </option>
+                            <option key="All" value="All">All</option>
+                            {cs_plot2_option.batches.map((batch) => (
+                                <option key={batch} value={batch}>{batch}</option>
                             ))}
                         </>
                     ) : (
@@ -108,38 +104,30 @@ const ExampleFigure2 = () => {
                 </select>
             </div>
 
-            {/* Loading */}
+            {/* Loading State Message */}
             <div className="mt-4">
                 {loading && (
                     <div className="flex justify-center items-center mt-4 text-primary">
                         <FaSyncAlt className="animate-spin text-xl" />
-                        <span className="ml-2">Loading cluster data…</span>
+                        <span className="ml-2">Loading cluster options...</span>
                     </div>
                 )}
             </div>
 
-            {/* Plot */}
-            {!loading && bc_plot2 && (
+            {/* Visualization Section */}
+            {!loading && cs_plot2 && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaChartBar className="text-primary" />
-                        Distribution Boxplot (Example)
+                        Cluster Distribution Plot
                     </h4>
-                    <p className="text-sm text-gray-500 mb-6">
-                        Beta value distribution for the selected CpG cluster, grouped by subtype.
-                    </p>
 
+                    {/* Only show when plot is loaded */}
                     <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadSVG("bc-example-plot2", "example-plot2.svg")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-plot2", "plot2.svg")}>
                             Download SVG
                         </button>
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadPNG("bc-example-plot2", "example-plot2.png")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-plot2", "plot2.png")}>
                             Download PNG
                         </button>
                     </div>

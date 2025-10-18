@@ -67,19 +67,19 @@ const ExampleFigure3 = () => {
         <div className="bg-base-200 p-5 rounded-lg shadow-md border border-base-300 mt-5">
             <h3 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaProjectDiagram className="text-primary" />
-                UMAP Visualizations (Example)
+                UMAP Visualizations
             </h3>
 
             <p className="text-sm text-gray-500">
-                Example UMAP projections of CpG clusters showing <strong>batch effects</strong> and{" "}
-                <strong>subtype distributions</strong>. The “corrected” views reflect batch-effect
-                adjustments.
+                This section displays UMAP projections of CpG clusters to illustrate both
+                <strong> batch effects</strong> and <strong> subtype distributions</strong>.
+                The corrected dataset reflects data after batch effect adjustment by the BCtypeFinder model.
             </p>
 
             {loading && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading UMAP data…</span>
+                    <span className="ml-2">Loading UMAP data...</span>
                 </div>
             )}
 

@@ -19,65 +19,80 @@ const ExampleFigure1 = () => {
     const [selectedBatch, setSelectedBatch] = useState("");
     const [selectedSubtype, setSelectedSubtype] = useState("");
 
-    // 1) load options
+    // Fetch batch-subtype options
     useEffect(() => {
         setLoadingState("loading-options");
         dispatch(getCSExamplePlot1Option())
             .unwrap()
             .then(() => setLoadingState("idle"))
-            .catch(() => setLoadingState("idle"));
+            .catch(error => {
+                console.error("Error fetching CSPlot1Option:", error);
+                setLoadingState("idle");
+            });
     }, [dispatch]);
 
-    // 2) pick first batch/subtype
+    // Auto-select first batch and subtype when options load
     useEffect(() => {
         if (cs_plot1_option && Object.keys(cs_plot1_option).length > 0) {
-            const firstBatch = Object.keys(cs_plot1_option).filter((b) => b !== "All")[0] || "";
-            const firstSubtype = cs_plot1_option[firstBatch]?.[0] || "";
+            const firstBatch = Object.keys(cs_plot1_option)[0];
+            const firstSubtype = [...(cs_plot1_option[firstBatch] || [])].sort()[0] || "";
             setSelectedBatch(firstBatch);
             setSelectedSubtype(firstSubtype);
         }
     }, [cs_plot1_option]);
 
-    // 3) fetch heatmap, then table
+    // Fetch heatmap & table data when batch and subtype are selected
     useEffect(() => {
-        if (!selectedBatch || !selectedSubtype) return;
-        setLoadingState("loading-heatmap");
-        dispatch(getCSExamplePlot1({ batch: selectedBatch, subtype: selectedSubtype }))
-            .unwrap()
-            .then((res) => {
-                // infer clusters from heatmap (CpG Cluster {id})
-                const clusters = new Set(
-                    res
-                        ?.map(({ rowLabel, colLabel }) => [
-                            String(rowLabel).replace("CpG Cluster ", "").trim(),
-                            String(colLabel).replace("CpG Cluster ", "").trim(),
-                        ])
-                        .flat() ?? []
-                );
-                const clustersString = [...clusters].join(",");
-                setLoadingState("loading-table");
-                return dispatch(getCSExamplePlot1Table({ clusters: clustersString })).unwrap();
-            })
-            .then(() => setLoadingState("idle"))
-            .catch(() => setLoadingState("idle"));
+        if (selectedBatch && selectedSubtype) {
+            setLoadingState("loading-heatmap");
+            dispatch(getCSExamplePlot1({ batch: selectedBatch, subtype: selectedSubtype }))
+                .unwrap()
+                .then((res) => {
+                    // Extract unique clusters from rowLabel and colLabel
+                    const clusters = new Set(
+                        res.map(({ rowLabel, colLabel }) => [
+                            rowLabel.replace("CpG Cluster ", "").trim(),
+                            colLabel.replace("CpG Cluster ", "").trim(),
+                        ]).flat()
+                    );
+
+                    // Convert Set to a comma-separated string and request table data
+                    const clustersString = [...clusters].join(",");
+                    setLoadingState("loading-table");
+                    dispatch(getCSExamplePlot1Table({ clusters: clustersString }))
+                        .unwrap()
+                        .then(() => setLoadingState("idle"))
+                        .catch(error => {
+                            console.error("Error fetching Plot1 table:", error);
+                            setLoadingState("idle");
+                        });
+                })
+                .catch(error => {
+                    console.error("Error fetching heatmap:", error);
+                    setLoadingState("idle");
+                });
+        }
     }, [dispatch, selectedBatch, selectedSubtype]);
 
-    const batchOptions = Object.keys(cs_plot1_option).filter((b) => b !== "All");
-    const subtypes = selectedBatch ? cs_plot1_option[selectedBatch] ?? [] : [];
+    // Extract options
+    const batchOptions = Object.keys(cs_plot1_option);
+    const subtypes = selectedBatch ? (cs_plot1_option[selectedBatch] || []) : [];
 
     return (
-        <div className="bg-base-2 00 p-6 rounded-lg shadow-md border border-base-300">
-            {/* Title */}
+        <div className="bg-base-200 p-6 rounded-lg shadow-md border border-base-300">
+            {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Analysis (Example)
+                CpG Cluster Analysis
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-                Explore CpG clusters across batches/subtypes using bundled example data.
+                This section provides interactive visualizations and data tables for exploring CpG clusters across different batches and subtypes.
+                Use the selectors below to filter the heatmap and corresponding cluster table.
             </p>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 items-center bg-base-100 p-4 rounded-lg shadow-sm border border-base-300">
+                {/* Batch Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Batch:
@@ -85,24 +100,22 @@ const ExampleFigure1 = () => {
                 <select
                     value={selectedBatch}
                     onChange={(e) => {
-                        const b = e.target.value;
-                        setSelectedBatch(b);
-                        setSelectedSubtype(cs_plot1_option[b]?.[0] || "");
+                        setSelectedBatch(e.target.value);
+                        setSelectedSubtype(cs_plot1_option[e.target.value]?.[0] || "");
                     }}
                     className="select select-bordered w-48"
                     disabled={loadingState === "loading-options"}
                 >
-                    {batchOptions.length ? (
-                        batchOptions.map((b) => (
-                            <option key={b} value={b}>
-                                {b}
-                            </option>
+                    {batchOptions.length > 0 ? (
+                        batchOptions.map((batch) => (
+                            <option key={batch} value={batch}>{batch}</option>
                         ))
                     ) : (
                         <option value="">No Batches Available</option>
                     )}
                 </select>
 
+                {/* Subtype Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Subtype:
@@ -113,11 +126,11 @@ const ExampleFigure1 = () => {
                     className="select select-bordered w-48"
                     disabled={loadingState === "loading-options"}
                 >
-                    {subtypes.length ? (
-                        subtypes.map((s) => (
-                            <option key={s} value={s}>
-                                {s}
-                            </option>
+                    {subtypes.length > 0 ? (
+                        [...subtypes]
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((subtype) => (
+                            <option key={subtype} value={subtype}>{subtype}</option>
                         ))
                     ) : (
                         <option value="">No Subtypes Available</option>
@@ -125,53 +138,47 @@ const ExampleFigure1 = () => {
                 </select>
             </div>
 
-            {/* Loading states */}
+            {/* Loading States */}
             {loadingState === "loading-options" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading filter options…</span>
+                    <span className="ml-2">Loading cluster options...</span>
                 </div>
             )}
             {loadingState === "loading-heatmap" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading heatmap…</span>
+                    <span className="ml-2">Loading heatmap data...</span>
                 </div>
             )}
             {loadingState === "loading-table" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading table…</span>
+                    <span className="ml-2">Loading CpG table data...</span>
                 </div>
             )}
 
-            {/* Heatmap */}
-            {loadingState === "idle" && (cs_plot1?.length ?? 0) > 0 && (
+            {/* Heatmap Plot */}
+            {loadingState === "idle" && cs_plot1?.length > 0 && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaChartBar className="text-primary" />
-                        Correlation Heatmap (Example)
+                        Correlation Heatmap
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        Spearman correlations between CpG clusters for the selected batch/subtype.
+                        This heatmap visualizes the pairwise correlations among the top 30 CpG clusters with the highest absolute correlation values.
                     </p>
 
                     <div className="flex justify-end gap-4">
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadSVG("cs-example-plot1", "example-plot1.svg")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-plot1", "plot1.svg")}>
                             Download SVG
                         </button>
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadPNG("cs-example-plot1", "example-plot1.png")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-plot1", "plot1.png")}>
                             Download PNG
                         </button>
                     </div>
 
-                    <div className="flex justify-center mt-4" id="cs-example-plot1">
+                    <div className="flex justify-center mt-4" id="plot1">
                         <div className="w-full max-w-4xl">
                             <ExamplePlot1 />
                         </div>
@@ -179,17 +186,16 @@ const ExampleFigure1 = () => {
                 </div>
             )}
 
-            {/* Table */}
+            {/* CpG Table */}
             {loadingState === "idle" && cs_plot1_table && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaTable className="text-primary" />
-                        CpG Cluster Details (Example)
+                        CpG Cluster Details
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        Attributes of CpG clusters shown in the heatmap above.
+                        This table lists detailed attributes of the top 30 CpG clusters included in the correlation heatmap above.
                     </p>
-
                     <ExamplePlot1Table />
                 </div>
             )}

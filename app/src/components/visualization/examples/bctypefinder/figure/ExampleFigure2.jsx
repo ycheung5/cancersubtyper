@@ -46,19 +46,19 @@ const ExampleFigure2 = () => {
 
     return (
         <div className="bg-base-200 p-6 rounded-lg shadow-md border border-base-300 mt-5">
-            {/* Title */}
+            {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Beta Value Distribution (Example)
+                CpG Cluster Beta Value Distribution
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-                Explore the distribution of beta values for a CpG cluster using bundled example data.
-                Filter by cluster and (optionally) restrict to a single batch.
+                This section allows you to explore the distribution of beta values for specific CpG clusters across batches.
+                Use the selectors below to select a cluster and optionally narrow by batch.
             </p>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 items-center bg-base-100 p-4 rounded-lg shadow-sm border border-base-300">
-                {/* Cluster */}
+                {/* Cluster Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Cluster:
@@ -69,7 +69,7 @@ const ExampleFigure2 = () => {
                     onChange={(e) => setSelectedCluster(e.target.value)}
                     disabled={loading}
                 >
-                    {bc_plot2_option?.cpg_groups?.length ? (
+                    {bc_plot2_option?.cpg_groups && bc_plot2_option.cpg_groups.length > 0 ? (
                         bc_plot2_option.cpg_groups.map((cluster) => (
                             <option key={cluster} value={cluster}>
                                 CpG Cluster {cluster}
@@ -80,7 +80,7 @@ const ExampleFigure2 = () => {
                     )}
                 </select>
 
-                {/* Batch */}
+                {/* Batch Selection */}
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
                     Batch:
@@ -91,15 +91,11 @@ const ExampleFigure2 = () => {
                     onChange={(e) => setSelectedBatch(e.target.value)}
                     disabled={loading}
                 >
-                    {bc_plot2_option?.batches?.length ? (
+                    {bc_plot2_option?.batches && bc_plot2_option.batches.length > 0 ? (
                         <>
-                            <option key="All" value="All">
-                                All
-                            </option>
-                            {bc_plot2_option.batches.map((b) => (
-                                <option key={b} value={b}>
-                                    {b}
-                                </option>
+                            <option key="All" value="All">All</option>
+                            {bc_plot2_option.batches.map((batch) => (
+                                <option key={batch} value={batch}>{batch}</option>
                             ))}
                         </>
                     ) : (
@@ -108,38 +104,32 @@ const ExampleFigure2 = () => {
                 </select>
             </div>
 
-            {/* Loading */}
+            {/* Loading State Message */}
             <div className="mt-4">
                 {loading && (
                     <div className="flex justify-center items-center mt-4 text-primary">
                         <FaSyncAlt className="animate-spin text-xl" />
-                        <span className="ml-2">Loading cluster data…</span>
+                        <span className="ml-2">Loading cluster data...</span>
                     </div>
                 )}
             </div>
 
-            {/* Plot */}
+            {/* Visualization Section */}
             {!loading && bc_plot2 && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaChartBar className="text-primary" />
-                        Distribution Boxplot (Example)
+                        Distribution Boxplot
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        Beta value distribution for the selected CpG cluster, grouped by subtype.
+                        This boxplot displays the distribution of beta values for the selected CpG cluster, grouped by batch.
                     </p>
 
                     <div className="flex justify-end gap-4 mt-4">
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadSVG("bc-example-plot2", "example-plot2.svg")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("bc-example-plot2", "plot2.svg")}>
                             Download SVG
                         </button>
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadPNG("bc-example-plot2", "example-plot2.png")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("bc-example-plot2", "plot2.png")}>
                             Download PNG
                         </button>
                     </div>

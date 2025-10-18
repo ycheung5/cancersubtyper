@@ -77,7 +77,7 @@ const DemoDashboard = () => {
                             <tr className="hover:bg-base-200 transition-all">
                                 {/* Project Name */}
                                 <td className="px-6 py-3 font-semibold text-base-content relative max-w-[250px] truncate">
-                                    <span className="block truncate">Project Demo</span>
+                                    <span className="block truncate">Breast Cancer Subtyping (DEMO)</span>
                                 </td>
 
                                 {/* Tumor Type */}
@@ -87,7 +87,7 @@ const DemoDashboard = () => {
 
                                 {/* Description */}
                                 <td className="px-6 py-3 text-base-content relative max-w-[250px] truncate">
-                                    <span className="block truncate">Demo Description</span>
+                                    <span className="block truncate">Prototype analysis using a breast cancer DNA methylation dataset in CancerSubtyper paper. Source dataset consists of TCGA-BRCA cohort, 1,060 primary breast tumor samples profiled using the Illumina Human Infinium 450K and 27K platforms, along with established PAM50 subtype annotations. For the unlabeled data, we integrated three publicly available breast cancer methylation datasets from the GeO: GSE69914, GSE75067, and GSE72245, collectively comprising 611 tumor samples.</span>
                                 </td>
 
                                 {/* Status */}

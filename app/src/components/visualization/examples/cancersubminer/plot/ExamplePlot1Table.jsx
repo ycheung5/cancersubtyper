@@ -5,7 +5,7 @@ import {chromosomeFormatter} from "../../../../../shared/utils/utils.jsx";
 
 const ExamplePlot1Table = () => {
     const plots = useSelector((s) => s.visualizationExample.plots);
-    const data = useMemo(() => plots["bc_plot1_table"] || [], [plots]);
+    const data = useMemo(() => plots["cs_plot1_table"] || [], [plots]);
 
     const [loadingState, setLoadingState] = useState("loading");
     const [searchQuery, setSearchQuery] = useState("");
@@ -18,9 +18,9 @@ const ExamplePlot1Table = () => {
     const columns = [
         { key: "cluster", label: "Cluster" },
         { key: "cpg", label: "CpG" },
-        { key: "position", label: "Position" },
         { key: "chr", label: "Chromosome" },
         { key: "strand", label: "Strand" },
+        { key: "position", label: "Position" },
         { key: "ucsc", label: "UCSC Gene" },
         { key: "genome", label: "Genome Build" },
     ];
@@ -31,10 +31,12 @@ const ExamplePlot1Table = () => {
     }, [data]);
 
     const filteredData = useMemo(() => {
-        return data.filter((row) => {
+        return data.filter(row => {
             if (!searchQuery) return true;
             if (searchColumn === "all") {
-                return Object.values(row).some((v) => v?.toString().toLowerCase().includes(searchQuery.toLowerCase()));
+                return Object.values(row).some(value =>
+                    value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+                );
             }
             return row[searchColumn]?.toString().toLowerCase().includes(searchQuery.toLowerCase());
         });
@@ -42,32 +44,32 @@ const ExamplePlot1Table = () => {
 
     const sortedData = useMemo(() => {
         if (!sortColumn) return filteredData;
+
         return [...filteredData].sort((a, b) => {
             let valA = a[sortColumn];
             let valB = b[sortColumn];
+
             if (!isNaN(valA) && !isNaN(valB)) {
                 valA = Number(valA);
                 valB = Number(valB);
             }
+
             return sortOrder === "asc" ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
         });
     }, [filteredData, sortColumn, sortOrder]);
 
     const totalPages = Math.max(1, Math.ceil(sortedData.length / rowsPerPage));
-    const paginatedData = useMemo(
-        () => sortedData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage),
-        [sortedData, currentPage]
-    );
+    const paginatedData = useMemo(() => sortedData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage), [sortedData, currentPage]);
 
     useEffect(() => {
         if (currentPage > totalPages) setCurrentPage(1);
     }, [totalPages, currentPage]);
 
-    if (loadingState === "loading") return <p className="text-yellow-500">Loading CpG table data…</p>;
+    if (loadingState === "loading") return <p className="text-yellow-500">Loading CpG table data...</p>;
 
     return (
         <div className="p-5">
-            {/* Search & Filter */}
+            {/* 🔹 Search & Filter Section */}
             <div className="flex flex-wrap items-center gap-4 mb-4">
                 <div className="relative flex items-center">
                     <FaSearch className="absolute left-3 text-gray-400" />
@@ -79,33 +81,37 @@ const ExamplePlot1Table = () => {
                         className="input input-bordered pl-10"
                     />
                 </div>
-                <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} className="select select-bordered">
+                <select
+                    value={searchColumn}
+                    onChange={(e) => setSearchColumn(e.target.value)}
+                    className="select select-bordered"
+                >
                     <option value="all">All Columns</option>
-                    {columns.map((c) => (
-                        <option key={c.key} value={c.key}>
-                            {c.label}
-                        </option>
-                    ))}
+                    {columns.map(col => <option key={col.key} value={col.key}>{col.label}</option>)}
                 </select>
             </div>
 
-            {/* Table */}
+            {/* 🔹 Table */}
             <div className="overflow-x-auto">
                 <table className="table table-fixed w-full border border-base-300 bg-base-100 rounded-lg shadow-md">
                     <thead>
                     <tr className="bg-base-300 text-base-content">
-                        {columns.map((col) => (
+                        {columns.map(col => (
                             <th
                                 key={col.key}
                                 className="cursor-pointer"
                                 onClick={() => {
                                     setSortColumn(col.key);
-                                    setSortOrder((prev) => (sortColumn === col.key && prev === "asc" ? "desc" : "asc"));
+                                    setSortOrder(prev => (sortColumn === col.key && prev === "asc") ? "desc" : "asc");
                                 }}
                             >
                                 <div className="flex items-center gap-2">
                                     {col.label}
-                                    {sortColumn === col.key ? (sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />) : <FaSort />}
+                                    {sortColumn === col.key ? (
+                                        sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />
+                                    ) : (
+                                        <FaSort />
+                                    )}
                                 </div>
                             </th>
                         ))}
@@ -131,23 +137,23 @@ const ExamplePlot1Table = () => {
                 </table>
             </div>
 
-            {/* Pagination */}
+            {/* 🔹 Pagination Controls */}
             <div className="flex justify-between items-center mt-4">
                 <button
                     className="btn btn-sm btn-outline"
-                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
                     <FaChevronLeft /> Prev
                 </button>
 
                 <span className="text-sm font-medium">
-          Page {currentPage} of {totalPages}
-        </span>
+                    Page {currentPage} of {totalPages}
+                </span>
 
                 <button
                     className="btn btn-sm btn-outline"
-                    onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >
                     Next <FaChevronRight />

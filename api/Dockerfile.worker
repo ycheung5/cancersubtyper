@@ -1,9 +1,17 @@
-FROM python:3.8-slim
+# Use CUDA runtime image with Python 3.10
+FROM nvidia/cuda:12.9.0-runtime-ubuntu22.04
 
 WORKDIR /app
 
+# Set environment variables to prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
 # Install system packages and R
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    git \
     r-base \
     r-base-dev \
     libcurl4-openssl-dev \
@@ -21,19 +29,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     automake \
     make \
     g++ \
+    tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages
 COPY requirements_worker.txt .
 RUN pip install --no-cache-dir -r requirements_worker.txt
 
-# Copy the app code
-COPY . .
-
 # Install required R packages
 RUN Rscript -e "install.packages('SNFtool', repos='https://cloud.r-project.org')" && \
     Rscript -e "install.packages('remotes', repos='https://cloud.r-project.org')" && \
     Rscript -e "remotes::install_github('Shamir-Lab/NEMO/NEMO')"
 
-# Run Celery
+# Copy the app code
+COPY . .
+
+# Run Celery worker with CUDA support
 CMD ["celery", "-A", "celery_config", "worker", "--loglevel=info", "--concurrency=2"]

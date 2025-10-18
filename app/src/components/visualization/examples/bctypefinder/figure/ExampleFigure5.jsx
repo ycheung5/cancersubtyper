@@ -43,15 +43,18 @@ const ExampleFigure5 = () => {
 
     return (
         <div className="bg-base-200 p-6 rounded-lg shadow-md border border-base-300 mt-5">
+            {/* Section Header */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartLine className="text-primary" />
-                Kaplan–Meier Survival Analysis (Example)
+                Kaplan-Meier Survival Analysis
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-                Example KM curves show survival by predicted subtype within a batch.
+                This Kaplan-Meier plot illustrates survival probabilities over time for different cancer subtypes
+                within the selected batch. The x-axis represents survival time, while the y-axis shows the estimated
+                probability of survival.
             </p>
 
-            {/* Batch selector */}
+            {/* Batch Selector */}
             <div className="flex flex-wrap gap-4 items-center bg-base-100 p-4 rounded-lg shadow-sm border border-base-300">
                 <label className="font-medium text-base-content flex items-center gap-2">
                     <FaFilter className="text-primary" />
@@ -63,11 +66,9 @@ const ExampleFigure5 = () => {
                     onChange={(e) => setSelectedBatch(e.target.value)}
                     disabled={loading}
                 >
-                    {bc_plot5_option?.length ? (
-                        bc_plot5_option.map((b) => (
-                            <option key={b} value={b}>
-                                {b}
-                            </option>
+                    {bc_plot5_option && bc_plot5_option.length > 0 ? (
+                        bc_plot5_option.map((batch) => (
+                            <option key={batch} value={batch}>{batch}</option>
                         ))
                     ) : (
                         <option value="">No Batches Available</option>
@@ -75,43 +76,41 @@ const ExampleFigure5 = () => {
                 </select>
             </div>
 
-            {/* Loading */}
-            {loading && (
-                <div className="flex justify-center items-center mt-4 text-primary">
-                    <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading Kaplan–Meier plot…</span>
-                </div>
-            )}
+            {/* Loading Indicator */}
+            <div className="mt-4">
+                {loading && (
+                    <div className="flex justify-center items-center mt-4 text-primary">
+                        <FaSyncAlt className="animate-spin text-xl" />
+                        <span className="ml-2">Loading Kaplan-Meier plot...</span>
+                    </div>
+                )}
+            </div>
 
-            {/* Plot */}
-            {!loading && bc_plot5?.data?.length > 0 && (
+            {/* Plot Section */}
+            {!loading && bc_plot5?.data.length > 0 && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
-                    <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg font-semibold text-base-content flex items-center gap-2">
-                            <FaChartLine className="text-primary" />
-                            Kaplan–Meier Plot (Example)
-                        </h4>
-                        <div className="flex gap-2">
-                            <button
-                                className="btn btn-sm btn-outline"
-                                onClick={() => downloadSVG("bc-example-plot5", "example-plot5.svg")}
-                            >
+                    <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
+                        <FaChartLine className="text-primary" />
+                        Kaplan-Meier Plot
+                    </h4>
+
+                    {/* Description + Plot */}
+                    <div className="flex flex-col">
+                        <p className="text-sm text-gray-500 mb-6">
+                            Curves represent the survival distribution for each predicted subtype.
+                            Divergence among curves may indicate the clinical relevance of subtype separation.
+                        </p>
+                        {/* Export Buttons */}
+                        <div className="flex justify-end gap-4 mb-4">
+                            <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("bc-example-plot5", "plot5.svg")}>
                                 Download SVG
                             </button>
-                            <button
-                                className="btn btn-sm btn-outline"
-                                onClick={() => downloadPNG("bc-example-plot5", "example-plot5.png")}
-                            >
+                            <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("bc-example-plot5", "plot5.png")}>
                                 Download PNG
                             </button>
                         </div>
+                        <ExamplePlot5 />
                     </div>
-
-                    <p className="text-sm text-gray-500 mb-6">
-                        Curve separation can indicate clinically meaningful subtype differences.
-                    </p>
-
-                    <ExamplePlot5 />
                 </div>
             )}
         </div>

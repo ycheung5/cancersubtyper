@@ -4,64 +4,64 @@ import * as d3 from "d3";
 
 const ExamplePlot5 = () => {
     const plots = useSelector((s) => s.visualizationExample.plots);
-    const { data, p_value } = useMemo(
-        () => plots["bc_plot5"] || { data: [], p_value: null },
-        [plots]
-    );
-
     const svgRef = useRef();
 
-    // KM computation identical to real plot
-    const computeKM = (rows, maxTime) => {
-        const grouped = d3.group(rows, (d) => d.subtype);
-        const survivalData = [];
+    const { data, p_value } = useMemo(() => plots["cs_plot5"] || { data: [], p_value: null }, [plots]);
 
-        for (const [subtype, recs] of grouped) {
-            recs.sort((a, b) => a.os_time - b.os_time);
-            let atRisk = recs.length;
-            let S = 1;
-            const kmPoints = [{ time: 0, survival: 1, subtype, censored: false }];
+    const computeKM = (data, maxTime) => {
+        const groupedData = d3.group(data, d => d.subtype);
+        let survivalData = [];
 
-            recs.forEach((r) => {
-                if (r.os_event === 1) S *= (atRisk - 1) / atRisk;
-                let t = r.os_time;
-                if (t === maxTime) t -= 1e-3; // avoid step drawing at boundary
-                kmPoints.push({ time: t, survival: S, subtype, censored: r.os_event === 0 });
-                atRisk--;
+        for (const [subtype, records] of groupedData) {
+            records.sort((a, b) => a.os_time - b.os_time);
+            let total = records.length;
+            let survival = 1;
+            let kmPoints = [];
+
+            // Add start point manually
+            kmPoints.push({ time: 0, survival: 1, subtype, censored: false });
+
+            records.forEach((d) => {
+                if (d.os_event === 1) {
+                    survival *= (total - 1) / total;
+                }
+
+                let time = d.os_time;
+                if (time === maxTime) time -= 1e-3;
+
+                kmPoints.push({ time, survival, subtype, censored: d.os_event === 0 });
+                total--;
             });
 
             survivalData.push({ subtype, kmPoints });
         }
+
         return survivalData;
     };
 
     useEffect(() => {
-        if (!data?.length) return;
+        if (!data || data.length === 0) return;
 
         const margin = { top: 20, right: 200, bottom: 80, left: 100 };
         const legendWidth = 100;
         const width = 750 - margin.left - margin.right;
         const height = 450 - margin.top - margin.bottom;
 
-        const maxTime = d3.max(data, (d) => d.os_time) || 0;
+        const maxTime = d3.max(data, d => d.os_time);
 
         const svg = d3.select(svgRef.current);
         svg.select("g").remove();
-        d3.select(".km-tooltip-example").remove();
+        d3.select(".km-tooltip").remove();
 
-        const g = svg
-            .attr(
-                "viewBox",
-                `0 0 ${width + margin.left + margin.right + legendWidth} ${height + margin.top + margin.bottom}`
-            )
+        const container = svg
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right + legendWidth} ${height + margin.top + margin.bottom}`)
             .attr("preserveAspectRatio", "xMidYMid meet")
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        const tooltip = d3
-            .select("body")
+        const tooltip = d3.select("body")
             .append("div")
-            .attr("class", "km-tooltip-example")
+            .attr("class", "km-tooltip")
             .style("position", "absolute")
             .style("pointer-events", "none")
             .style("background", "#111")
@@ -73,26 +73,35 @@ const ExamplePlot5 = () => {
             .style("display", "none")
             .style("z-index", "1000");
 
-        const kmData = computeKM(data, maxTime);
-        const counts = Object.fromEntries(
-            d3.group(data, (d) => d.subtype).entries().map(([k, v]) => [k, v.length])
-        );
+        const survivalData = computeKM(data, maxTime);
+        const sampleCounts = Object.fromEntries(d3.group(data, d => d.subtype).entries().map(([k, v]) => [k, v.length]));
 
-        const x = d3.scaleLinear().domain([0, maxTime * 1.02]).range([0, width]);
-        const y = d3.scaleLinear().domain([0, 1]).range([height, 0]);
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const xScale = d3.scaleLinear()
+            .domain([0, maxTime * 1.02])
+            .range([0, width]);
 
-        g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(6));
-        g.append("g").call(d3.axisLeft(y));
+        const yScale = d3.scaleLinear()
+            .domain([0, 1])
+            .range([height, 0]);
 
-        g.append("text")
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+        container.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale).ticks(6).tickFormat(d3.format(",")))
+            .selectAll("text")
+            .style("font-size", "12px");
+
+        container.append("g").call(d3.axisLeft(yScale));
+
+        container.append("text")
             .attr("x", width / 2)
             .attr("y", height + 50)
             .attr("text-anchor", "middle")
             .attr("font-size", "14px")
             .text("Time");
 
-        g.append("text")
+        container.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height / 2)
             .attr("y", -60)
@@ -100,30 +109,32 @@ const ExamplePlot5 = () => {
             .attr("font-size", "14px")
             .text("Survival Probability");
 
-        const line = d3
-            .line()
-            .x((d) => x(d.time))
-            .y((d) => y(d.survival))
+        const line = d3.line()
+            .x(d => xScale(d.time))
+            .y(d => yScale(d.survival))
             .curve(d3.curveStepAfter);
 
-        g.selectAll(".km-line")
-            .data(kmData)
+        container.selectAll(".km-line")
+            .data(survivalData)
             .enter()
             .append("path")
-            .attr("class", (d) => `km-line line-${d.subtype.replace(/\s/g, "")}`)
+            .attr("class", d => `km-line line-${d.subtype.replace(/\s/g, "")}`)
             .attr("fill", "none")
-            .attr("stroke", (d) => color(d.subtype))
+            .attr("stroke", d => colorScale(d.subtype))
             .attr("stroke-width", 2.5)
-            .attr("d", (d) => line(d.kmPoints));
+            .attr("d", d => line(d.kmPoints))
+            .style("transition", "opacity 0.3s");
 
-        // Censor hover hitboxes
-        const censored = kmData.flatMap((d) => d.kmPoints.filter((p) => p.censored));
-        g.selectAll(".censor-hitbox")
-            .data(censored)
+        // Draw censor marks and hitboxes
+        const censoredPoints = survivalData.flatMap(d => d.kmPoints.filter(p => p.censored));
+
+        // Transparent hover hitboxes (invisible but bigger)
+        container.selectAll(".censor-hitbox")
+            .data(censoredPoints)
             .enter()
             .append("circle")
-            .attr("cx", (d) => x(d.time))
-            .attr("cy", (d) => y(d.survival))
+            .attr("cx", d => xScale(d.time))
+            .attr("cy", d => yScale(d.survival))
             .attr("r", 8)
             .attr("fill", "transparent")
             .on("mouseover", (event, d) => {
@@ -138,19 +149,20 @@ const ExamplePlot5 = () => {
                     );
             })
             .on("mousemove", (event) => {
-                tooltip.style("left", `${event.pageX + 10}px`).style("top", `${event.pageY - 10}px`);
+                tooltip
+                    .style("left", `${event.pageX + 10}px`)
+                    .style("top", `${event.pageY - 10}px`);
             })
             .on("mouseout", () => tooltip.style("display", "none"));
 
-        // p-value
+        // P-value
         if (p_value !== null) {
             const formatted = p_value.toExponential(1);
-            const m = formatted.match(/^([\d.]+)e([-+]?)(\d+)$/);
-            if (m) {
-                const [, base, sign, expDigits] = m;
+            const match = formatted.match(/^([\d.]+)e([-+]?)(\d+)$/);
+            if (match) {
+                const [_, base, sign, expDigits] = match;
                 const exponent = `${sign === "-" ? "−" : ""}${expDigits}`;
-                const pText = g
-                    .append("text")
+                const pText = container.append("text")
                     .attr("x", width * 0.05)
                     .attr("y", height * 0.85)
                     .attr("font-size", "16px")
@@ -158,56 +170,65 @@ const ExamplePlot5 = () => {
                     .attr("fill", "black");
 
                 pText.append("tspan").text(`p = ${base} × 10`);
-                pText
-                    .append("tspan")
+                pText.append("tspan")
                     .text(exponent)
                     .attr("baseline-shift", "super")
                     .attr("font-size", "10px");
             }
         }
 
-        // legend
-        const legend = g.append("g").attr("transform", `translate(${width + 20}, 0)`);
-        kmData.forEach((d, i) => {
-            const s = d.subtype;
-            const item = legend
-                .append("g")
+        // Legend with sample count and hover highlight
+        const legend = container.append("g")
+            .attr("transform", `translate(${width + 20}, 0)`);
+
+        survivalData
+            .sort((a, b) => a.subtype.localeCompare(b.subtype))
+            .forEach((d, i) => {
+            const subtype = d.subtype;
+            const legendItem = legend.append("g")
                 .attr("transform", `translate(0, ${i * 25})`)
                 .style("cursor", "pointer")
                 .on("mouseover", () => {
-                    svg.selectAll(".km-line").style("opacity", (L) => (L.subtype === s ? 1 : 0.15));
-                    svg.selectAll(".censor-hitbox").style("opacity", (C) => (C.subtype === s ? 1 : 0.15));
+                    svg.selectAll(".km-line").style("opacity", l => l.subtype === subtype ? 1 : 0.15);
+                    svg.selectAll(".km-tooltip").style("opacity", l => l.subtype === subtype ? 1 : 0.15);
+                    svg.selectAll("circle").style("opacity", c => c.subtype === subtype ? 1 : 0.15);
+                    svg.selectAll(".censor-hitbox").style("opacity", c => c.subtype === subtype ? 1 : 0.15);
                 })
                 .on("mouseout", () => {
                     svg.selectAll(".km-line").style("opacity", 1);
+                    svg.selectAll(".km-tooltip").style("opacity", 1);
+                    svg.selectAll("circle").style("opacity", 1);
                     svg.selectAll(".censor-hitbox").style("opacity", 1);
                 });
 
-            item.append("circle").attr("cx", 0).attr("cy", 6).attr("r", 6).attr("fill", color(s));
-            item
-                .append("text")
+            legendItem.append("circle")
+                .attr("cx", 0)
+                .attr("cy", 6)
+                .attr("r", 6)
+                .attr("fill", colorScale(subtype));
+
+            legendItem.append("text")
                 .attr("x", 15)
                 .attr("y", 10)
                 .attr("font-size", "12px")
                 .attr("fill", "#000")
-                .text(`${s} (n = ${counts[s]})`);
+                .text(`${subtype} (n = ${sampleCounts[subtype]})`);
         });
 
         return () => {
             svg.select("g").remove();
-            d3.select(".km-tooltip-example").remove();
+            d3.select(".km-tooltip").remove();
         };
     }, [data, p_value]);
 
-    if (!data?.length) {
+    if (!data || data.length === 0) {
         return (
             <div className="text-center text-gray-500 text-lg py-4">
                 No data available for this plot.
             </div>
         );
     }
-
-    return <svg ref={svgRef} id="bc-example-plot5"></svg>;
+    return <svg ref={svgRef} id="cs-example-plot5"></svg>;
 };
 
 export default ExamplePlot5;

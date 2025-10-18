@@ -18,9 +18,9 @@ const Plot1Table = () => {
     const columns = [
         { key: "cluster", label: "Cluster" },
         { key: "cpg", label: "CpG" },
-        { key: "position", label: "Position" },
         { key: "chr", label: "Chromosome" },
         { key: "strand", label: "Strand" },
+        { key: "position", label: "Position" },
         { key: "ucsc", label: "UCSC Gene" },
         { key: "genome", label: "Genome Build" },
     ];

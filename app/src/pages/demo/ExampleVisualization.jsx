@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import BackToTopButton from "../../components/BackToTopButton.jsx";
 import { RouteConstants } from "../../shared/constants/RouteConstants.js";
 
 // Example containers
 import BCTyperFinderExample from "../../components/visualization/examples/BCTyperFinderExample.jsx";
-// import CancerSubminerExample from "../components/visualization/examples/CancerSubminerExample.jsx";
+import CancerSubminerExample from "../../components/visualization/examples/CancerSubminerExample.jsx";
 
 const ExampleVisualization = () => {
     const navigate = useNavigate();
-    const [modelName, setModelName] = useState("BCtypeFinder"); // use state instead of params
-
-    // const handleModelChange = (e) => {
-    //     setModelName(e.target.value);
-    // };
+    const location = useLocation();
+    const modelName = location.state?.modelName || "BCtypeFinder";
 
     return (
         <div className="flex justify-center">
@@ -33,30 +30,16 @@ const ExampleVisualization = () => {
                                 onClick={() => navigate(RouteConstants.demoProject)}
                                 className="cursor-pointer text-primary"
                             >
-                                Demo Project
+                                Breast Cancer Subtyping (DEMO)
                             </a>
                         </li>
-                        <li className="text-base-content">Demo Visualization</li>
+                        <li className="text-base-content">Breast Cancer Subtyping (DEMO) Visualization</li>
                     </ul>
                 </div>
 
-                {/* Model selector */}
-                {/*<div className="flex items-center gap-3">*/}
-                {/*    <label className="font-medium">Choose Model:</label>*/}
-                {/*    <select*/}
-                {/*        className="select select-bordered"*/}
-                {/*        value={modelName}*/}
-                {/*        onChange={handleModelChange}*/}
-                {/*    >*/}
-                {/*        <option value="">-- Select --</option>*/}
-                {/*        <option value="BCtypeFinder">BCtypeFinder</option>*/}
-                {/*        <option value="CancerSubminer">CancerSubminer</option>*/}
-                {/*    </select>*/}
-                {/*</div>*/}
-
                 {/* Render model-specific example */}
                 {modelName === "BCtypeFinder" && <BCTyperFinderExample />}
-                {/*{modelName === "CancerSubminer" && <CancerSubminerExample />}*/}
+                {modelName === "CancerSubminer" && <CancerSubminerExample />}
             </div>
 
             <BackToTopButton />

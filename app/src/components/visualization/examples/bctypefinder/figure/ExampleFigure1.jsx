@@ -66,14 +66,14 @@ const ExampleFigure1 = () => {
     const subtypes = selectedBatch ? bc_plot1_option[selectedBatch] ?? [] : [];
 
     return (
-        <div className="bg-base-2 00 p-6 rounded-lg shadow-md border border-base-300">
-            {/* Title */}
+        <div className="bg-base-200 p-6 rounded-lg shadow-md border border-base-300">
+            {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Analysis (Example)
+                CpG Cluster Analysis
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-                Explore CpG clusters across batches/subtypes using bundled example data.
+                This section provides visualizations and tables for exploring CpG clusters across different batches and subtypes.
             </p>
 
             {/* Filters */}
@@ -85,18 +85,15 @@ const ExampleFigure1 = () => {
                 <select
                     value={selectedBatch}
                     onChange={(e) => {
-                        const b = e.target.value;
-                        setSelectedBatch(b);
-                        setSelectedSubtype(bc_plot1_option[b]?.[0] || "");
+                        setSelectedBatch(e.target.value);
+                        setSelectedSubtype(bc_plot1_option[e.target.value]?.[0] || "");
                     }}
                     className="select select-bordered w-48"
                     disabled={loadingState === "loading-options"}
                 >
-                    {batchOptions.length ? (
-                        batchOptions.map((b) => (
-                            <option key={b} value={b}>
-                                {b}
-                            </option>
+                    {batchOptions.length > 0 ? (
+                        batchOptions.map((batch) => (
+                            <option key={batch} value={batch}>{batch}</option>
                         ))
                     ) : (
                         <option value="">No Batches Available</option>
@@ -113,11 +110,9 @@ const ExampleFigure1 = () => {
                     className="select select-bordered w-48"
                     disabled={loadingState === "loading-options"}
                 >
-                    {subtypes.length ? (
-                        subtypes.map((s) => (
-                            <option key={s} value={s}>
-                                {s}
-                            </option>
+                    {subtypes.length > 0 ? (
+                        subtypes.map((subtype) => (
+                            <option key={subtype} value={subtype}>{subtype}</option>
                         ))
                     ) : (
                         <option value="">No Subtypes Available</option>
@@ -125,48 +120,42 @@ const ExampleFigure1 = () => {
                 </select>
             </div>
 
-            {/* Loading states */}
+            {/* Loading Messages */}
             {loadingState === "loading-options" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading filter options…</span>
+                    <span className="ml-2">Loading filter options...</span>
                 </div>
             )}
             {loadingState === "loading-heatmap" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading heatmap…</span>
+                    <span className="ml-2">Loading heatmap...</span>
                 </div>
             )}
             {loadingState === "loading-table" && (
                 <div className="flex justify-center items-center mt-4 text-primary">
                     <FaSyncAlt className="animate-spin text-xl" />
-                    <span className="ml-2">Loading table…</span>
+                    <span className="ml-2">Loading table data...</span>
                 </div>
             )}
 
-            {/* Heatmap */}
-            {loadingState === "idle" && (bc_plot1?.length ?? 0) > 0 && (
+            {/* Heatmap Plot */}
+            {loadingState === "idle" && bc_plot1?.length > 0 && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaChartBar className="text-primary" />
-                        Correlation Heatmap (Example)
+                        Correlation Heatmap
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        Spearman correlations between CpG clusters for the selected batch/subtype.
+                        This heatmap visualizes Spearman correlations between the CpG clusters across all samples in the selected batch, highlighting the top 30 CpG clusters with the highest absolute correlation coefficients.
                     </p>
 
                     <div className="flex justify-end gap-4">
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadSVG("bc-example-plot1", "example-plot1.svg")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("bc-example-plot1", "plot1.svg")}>
                             Download SVG
                         </button>
-                        <button
-                            className="btn btn-sm btn-outline"
-                            onClick={() => downloadPNG("bc-example-plot1", "example-plot1.png")}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("bc-example-plot1", "plot1.png")}>
                             Download PNG
                         </button>
                     </div>
@@ -179,15 +168,15 @@ const ExampleFigure1 = () => {
                 </div>
             )}
 
-            {/* Table */}
+            {/* CpG Table */}
             {loadingState === "idle" && bc_plot1_table && (
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaTable className="text-primary" />
-                        CpG Cluster Details (Example)
+                        Details for CpG clusters extracted from the model
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        Attributes of CpG clusters shown in the heatmap above.
+                        This table lists detailed attributes of the top 30 CpG clusters included in the correlation heatmap above.
                     </p>
 
                     <ExamplePlot1Table />

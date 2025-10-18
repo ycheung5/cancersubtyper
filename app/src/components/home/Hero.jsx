@@ -30,9 +30,7 @@ const Hero = () => {
                     </h1>
 
                     <p className="mb-6 text-xl font-medium leading-relaxed">
-                        Leveraging the power of <span className="text-red-400 font-semibold">deep learning </span>
-                        to revolutionize <span className="text-red-400 font-semibold">cancer subtyping.</span> <br />
-                        Gain precise insights and advance predictive accuracy like never before.
+                        A Web-Based <span className="text-red-400 font-bold">Deep Learning</span> Platform for <span className="text-red-400 font-bold">Cancer Subtyping</span> Through DNA Methylation Data
                     </p>
 
                     <div className="flex justify-center flex-wrap gap-4">

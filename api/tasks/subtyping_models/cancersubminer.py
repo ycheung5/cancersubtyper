@@ -739,11 +739,12 @@ def run_cancersubminer(
             tmp_cluster_source = tmp_cluster[tmp_cluster['Batch'] == "source"]
             if len(tmp_cluster_source) == 0:
                 continue
-            subtype_assigned_to_cluster = tmp_cluster_source['original'].value_counts().index[0]
+            subtype_assigned_to_cluster = tmp_cluster_source['original'].value_counts().index[0].item()
             #
             tmp_cluster_target = tmp_cluster[tmp_cluster['Batch'] == "target"]
             tmp_cluster_target_index = tmp_cluster_target.index.tolist()
-            target_y_df.at[tmp_cluster_target_index, 'new'] = subtype_assigned_to_cluster
+            if len(tmp_cluster_target_index) > 0:
+                target_y_df.loc[tmp_cluster_target_index, 'new'] = subtype_assigned_to_cluster
         #
         target_pseudo_y_adjusted = target_y_df['new'].values
         target_pseudo_y_adjusted = torch.from_numpy(target_pseudo_y_adjusted)
@@ -806,9 +807,15 @@ def run_cancersubminer(
         # Check whether having better silhouette score
         #
         prev_silhouette = silhouette_score(X_embed.detach().cpu().numpy(), z_subtype.detach().cpu().numpy())
-        new_z_subtype = z_subtype.detach().cpu().numpy()
-        new_z_subtype[low_conf_sample_list] = num_subtype
-        new_silhouette = silhouette_score(X_embed.detach().cpu().numpy(), new_z_subtype)
+        if len(low_conf_sample_list) > 0 :
+            z_np_candidate = z_subtype.detach().cpu().numpy().copy()
+            z_np_candidate[low_conf_sample_list] = num_subtype
+            new_silhouette = silhouette_score(X_embed.detach().cpu().numpy(), z_np_candidate)
+        else :
+            new_silhouette = prev_silhouette
+        #new_z_subtype = z_subtype.detach().cpu().numpy()
+        #new_z_subtype[low_conf_sample_list] = num_subtype
+        #new_silhouette = silhouette_score(X_embed.detach().cpu().numpy(), new_z_subtype)
         #
         pdist_stack = 0.0
         if new_silhouette > prev_silhouette:
@@ -825,9 +832,11 @@ def run_cancersubminer(
             pdist_stack = nn.L1Loss()(subtype_centroid_stack, X_embed_low_conf)
             align_loss += pdist_stack
             num_subtype += 1
-            new_z_subtype = torch.from_numpy(new_z_subtype)
-            new_z_subtype = new_z_subtype.to(device)
-            z_subtype = new_z_subtype
+            z_subtype = z_subtype.clone()
+            z_subtype[low_conf_sample_list] = int(num_subtype-1)
+            #new_z_subtype = torch.from_numpy(new_z_subtype)
+            #new_z_subtype = new_z_subtype.to(device)
+            #z_subtype = new_z_subtype
             pdist_stack = pdist_stack.item()
             #
         # if align_loss == 0.0 :
@@ -862,7 +871,7 @@ def run_cancersubminer(
         for i in range(tmp_num_cluster):
             tmp_y_cluster = tmp_y_df[tmp_y_df['cluster'] == i]
             tmp_high_conf = tmp_y_cluster[tmp_y_cluster[X_conf_score.columns].max(axis=1) >= 0.95]
-            tmp_maj_subtype = tmp_high_conf.value_counts('origin').index[0]
+            tmp_maj_subtype = tmp_high_conf.value_counts('origin').index[0].item()
             tmp_low_conf = tmp_y_cluster[tmp_y_cluster[X_conf_score.columns].max(axis=1) < 0.95]
             if len(tmp_low_conf) > 0:
                 tmp_low_conf_idx = tmp_low_conf.index.tolist()

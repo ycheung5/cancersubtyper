@@ -63,6 +63,13 @@ services:
       - redis
       - db
       - api
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   flower:
     container_name: flower
@@ -80,6 +87,28 @@ services:
     depends_on:
       - redis
       - celery_worker
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/ssl:/etc/nginx/ssl
+  #     - ./app/dist:/var/www/html  # For serving static files
+  #   depends_on:
+  #     - app
+  #     - api
+  #   restart: always
 
 volumes:
   postgres_data:

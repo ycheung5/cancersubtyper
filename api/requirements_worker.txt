@@ -27,20 +27,13 @@ alembic~=1.13.1  # Database migrations
 pytz~=2024.1  # Handle timezones correctly
 
 # Data science and machine learning
-numpy~=1.19.1
-# numpy~=1.26.4
-pandas~=1.1.1
-# pandas~=2.2.0
-scipy==1.5.4
-# scipy==1.10.1  # Pin to compatible version
-torch~=1.6.0
-# torch~=2.2.2
-torchvision~=0.7.0
-# torchvision~=0.17.2
-scikit-learn~=0.23.2
-# scikit-learn~=1.4.1
-umap-learn~=0.5.3
-# umap-learn~=0.5.5
+numpy~=1.26.4
+pandas~=2.2.0
+scipy==1.10.1  # Pin to compatible version
+torch~=2.2.2
+torchvision~=0.17.2
+scikit-learn~=1.4.1
+umap-learn~=0.5.5
 lifelines~=0.27.8
 kneed~=0.8.5
 

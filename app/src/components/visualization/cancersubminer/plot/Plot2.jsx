@@ -64,7 +64,6 @@ const Plot2 = () => {
         svg.append("g")
             .call(d3.axisLeft(yScale).ticks(6));
 
-        // ✅ Floating tooltip
         if (!tooltipRef.current) {
             tooltipRef.current = d3.select("body").append("div")
                 .attr("class", "tooltip")
@@ -82,7 +81,6 @@ const Plot2 = () => {
 
         const tooltip = tooltipRef.current;
 
-        // ✅ Draw boxes
         svg.selectAll(".box")
             .data(boxData)
             .enter()
