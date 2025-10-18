@@ -176,7 +176,7 @@ const ExamplePlot1 = () => {
         };
     }, [plots]);
 
-    return <svg ref={svgRef} id="bc-example-plot1"></svg>;
+    return <svg ref={svgRef} id="cs-example-plot1"></svg>;
 };
 
 export default ExamplePlot1;

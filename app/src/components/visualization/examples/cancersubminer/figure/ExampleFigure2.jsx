@@ -124,10 +124,10 @@ const ExampleFigure2 = () => {
 
                     {/* Only show when plot is loaded */}
                     <div className="flex justify-end gap-4 mt-4">
-                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-plot2", "plot2.svg")}>
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-example-plot2", "plot2.svg")}>
                             Download SVG
                         </button>
-                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-plot2", "plot2.png")}>
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-example-plot2", "plot2.png")}>
                             Download PNG
                         </button>
                     </div>

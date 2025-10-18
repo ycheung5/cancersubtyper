@@ -160,7 +160,7 @@ const ExampleFigure1 = () => {
                         </button>
                     </div>
 
-                    <div className="flex justify-center mt-4" id="bc-example-plot1">
+                    <div className="flex justify-center mt-4">
                         <div className="w-full max-w-4xl">
                             <ExamplePlot1 />
                         </div>

@@ -12,7 +12,7 @@ from repository.job_repository import JobRepository
 from repository.model_repository import ModelRepository
 from repository.project_repository import ProjectRepository
 from schemas.jobs import JobCreate, JobResponse
-from util.path_untils import job_result_path
+from util.path_untils import job_result_path, example_result_path
 
 router = APIRouter(prefix="/job", tags=["job"])
 
@@ -129,6 +129,40 @@ def get_models(
 ):
     model_repo = ModelRepository(db)
     return model_repo.get_all_models()
+
+@router.get("/examples/{model}/results", status_code=HTTPStatus.OK)
+def get_example_results(model: str):
+    """
+    Endpoint to return the pre-zipped result file for example data.
+    Model should be 'bctypefinder' or 'cancersubminer'.
+    No authentication required for demo/example downloads.
+    """
+    
+    # Validate model parameter
+    if model not in ["bctypefinder", "cancersubminer"]:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, 
+            detail="Model must be 'bctypefinder' or 'cancersubminer'"
+        )
+    
+    # Get the example result path
+    example_dir = example_result_path(model)
+    zip_path = os.path.join(example_dir, "results.zip")
+    
+    # Check if the zip file exists
+    if not os.path.exists(zip_path):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, 
+            detail=f"Example result ZIP file not found for {model}"
+        )
+    
+    # Return the ZIP file for download
+    return FileResponse(
+        zip_path,
+        media_type="application/zip",
+        filename=f"{model}_example_results.zip"
+    )
+
 
 @router.get("/{job_id}/download/results", status_code=HTTPStatus.OK)
 async def download_results(

@@ -170,15 +170,15 @@ const ExampleFigure1 = () => {
                     </p>
 
                     <div className="flex justify-end gap-4">
-                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-plot1", "plot1.svg")}>
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadSVG("cs-example-plot1", "plot1.svg")}>
                             Download SVG
                         </button>
-                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-plot1", "plot1.png")}>
+                        <button className="btn btn-sm btn-outline" onClick={() => downloadPNG("cs-example-plot1", "plot1.png")}>
                             Download PNG
                         </button>
                     </div>
 
-                    <div className="flex justify-center mt-4" id="plot1">
+                    <div className="flex justify-center mt-4">
                         <div className="w-full max-w-4xl">
                             <ExamplePlot1 />
                         </div>

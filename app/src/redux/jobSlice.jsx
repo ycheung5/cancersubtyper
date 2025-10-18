@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import api from "../shared/utils/axiosInstance.jsx";
+import axios from "axios";
+
+const base_url = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export const getJobList = createAsyncThunk('job/list', async (project_id, { rejectWithValue }) => {
     return api.get(`/job/project/${project_id}`)
@@ -31,6 +34,14 @@ export const downloadResults = createAsyncThunk('job/results', async (job_id, { 
     })
         .then(res => res.data)
         .catch(err => rejectWithValue(err.response?.data?.detail));
+});
+
+export const downloadExampleResults = createAsyncThunk('job/exampleResults', async (model, { rejectWithValue }) => {
+    return axios.get(`${base_url}/job/examples/${model}/results`, {
+        responseType: 'blob',
+    })
+        .then(res => ({ data: res.data, model }))
+        .catch(err => rejectWithValue(err.response?.data?.detail || 'Failed to download example results'));
 });
 
 const jobSlice = createSlice({
@@ -70,14 +81,29 @@ const jobSlice = createSlice({
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             })
+            .addCase(downloadExampleResults.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+
+                const blob = new Blob([action.payload.data], { type: 'application/zip' });
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${action.payload.model}_example_results.zip`;
+                document.body.appendChild(a);
+                a.click();
+
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
             .addMatcher(
-                isAnyOf(getJobList.pending, createJob.pending, downloadResults.pending),
+                isAnyOf(getJobList.pending, createJob.pending, downloadResults.pending, downloadExampleResults.pending),
                 (state) => {
                     state.status = 'loading';
                 }
             )
             .addMatcher(
-                isAnyOf(getJobList.rejected, createJob.rejected, downloadResults.rejected),
+                isAnyOf(getJobList.rejected, createJob.rejected, downloadResults.rejected, downloadExampleResults.rejected),
                 (state, action) => {
                     state.status = 'failed';
                     state.error = action?.payload;

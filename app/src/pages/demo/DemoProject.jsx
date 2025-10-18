@@ -17,12 +17,14 @@ import {MdCancel} from "react-icons/md";
 import EditProject from "../../components/project/EditProject.jsx";
 import {AiOutlineFileText} from "react-icons/ai";
 import JobStatusBadge from "../../components/project/job/JobStatusBadge.jsx";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {showToast} from "../../redux/toastSlice.jsx";
+import {downloadExampleResults} from "../../redux/jobSlice.jsx";
 
 const DemoProject = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const jobStatus = useSelector((state) => state.job.status);
 
     const editProjectHandler = () => {
         dispatch(showToast({ message: "Demo project cannot be edited" , type: "error" }));
@@ -32,8 +34,21 @@ const DemoProject = () => {
         dispatch(showToast({ message: "Demo project cannot be deleted" , type: "error" }));
     }
 
-    const downloadResultHandler = () => {
-        dispatch(showToast({ message: "Demo result cannot be downloaded" , type: "error" }));
+    const downloadResultHandler = (model) => {
+        dispatch(downloadExampleResults(model))
+            .unwrap()
+            .then(() => {
+                dispatch(showToast({ 
+                    message: `${model} example results downloaded successfully`, 
+                    type: "success" 
+                }));
+            })
+            .catch((error) => {
+                dispatch(showToast({ 
+                    message: error || "Failed to download example results", 
+                    type: "error" 
+                }));
+            });
     }
 
     return (
@@ -233,10 +248,11 @@ const DemoProject = () => {
                                     <div className="flex justify-end gap-3 mt-5">
                                         <button
                                             className="btn btn-sm btn-outline btn-success flex items-center"
-                                            onClick={downloadResultHandler}
+                                            onClick={() => downloadResultHandler('bctypefinder')}
+                                            disabled={jobStatus === 'loading'}
                                         >
                                             <FaFileDownload className="mr-2"/>
-                                            Download Result
+                                            {jobStatus === 'loading' ? 'Downloading...' : 'Download Result'}
                                         </button>
                                         <button
                                             className="btn btn-sm btn-outline btn-info flex items-center"
@@ -277,10 +293,11 @@ const DemoProject = () => {
                                     <div className="flex justify-end gap-3 mt-5">
                                         <button
                                             className="btn btn-sm btn-outline btn-success flex items-center"
-                                            onClick={downloadResultHandler}
+                                            onClick={() => downloadResultHandler('cancersubminer')}
+                                            disabled={jobStatus === 'loading'}
                                         >
                                             <FaFileDownload className="mr-2"/>
-                                            Download Result
+                                            {jobStatus === 'loading' ? 'Downloading...' : 'Download Result'}
                                         </button>
                                         <button
                                             className="btn btn-sm btn-outline btn-info flex items-center"
