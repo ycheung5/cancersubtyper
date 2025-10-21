@@ -3,12 +3,26 @@ import bcms from "../../assets/bctypefinder-model-structure.png";
 import csms from "../../assets/cancersubminer-model-structure.png";
 import nsf from "../../assets/nsf-logo.png";
 import nih from "../../assets/nih-logo.png";
+import webstructure from "../../assets/cancersubtyper-web-structure.png";
 
 const ModelStructure = () => {
     return (
         <div id="model-structure" className="pt-20 pb-4 bg-gray-50">
             <div className="max-w-7xl mx-auto px-6 text-center">
                 <h2 className="text-4xl font-extrabold mb-14 text-gray-800">
+                Functionalities of CancerSubtyper (Data processing, deep learning modeling, visualization, and downstream analysis)
+                </h2>
+                <div className="grid grid-cols-1 gap-12">
+                    <a href={webstructure} target="_blank" rel="noopener noreferrer">
+                        <img
+                            src={webstructure}
+                            alt="Web Structure"
+                            className="rounded-lg w-[90%] object-contain mx-auto cursor-pointer hover:opacity-90 transition"
+                        />
+                    </a>
+                </div>
+
+                <h2 className="text-4xl font-extrabold my-14 text-gray-800">
                 Deep Learning-Based Cancer Subtyping Models in CancerSubtyper
                 </h2>
 
