@@ -350,21 +350,6 @@ Default storage limit: **20GB per user** (configurable via `MAX_STORAGE_BYTES`)
 
 ---
 
-## Citation
-
-If you use CancerSubtyper in your research, please cite:
-
-```bibtex
-@article{bctypefinder2025,
-  title={BCtypeFinder: Deep Learning-Based Breast Cancer Subtype Prediction},
-  journal={Genetic Testing and Molecular Biomarkers},
-  year={2025},
-  url={https://www.liebertpub.com/doi/abs/10.1177/15578666251380233}
-}
-```
-
----
-
 ## Acknowledgments
 
 This work was supported by:
