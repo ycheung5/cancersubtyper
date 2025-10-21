@@ -329,7 +329,7 @@ api/data/
 └── user_{id}/          # Per-user directories
     └── project_{id}/   # Per-project directories
         ├── source/     # Source dataset
-        ├── target/     # Target dataset (optional)
+        ├── target/     # Target dataset
         ├── metadata/   # Clinical metadata
         └── job_{id}/   # Job-specific results
 ```
