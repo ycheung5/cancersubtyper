@@ -179,8 +179,6 @@ data/user_*/
 # Allow global example data to be tracked
 !data/global/
 !data/global/sample/
-!data/global/sample/data/
-!data/global/sample/data/*
 
 # Database files
 *.db
