@@ -329,7 +329,7 @@ api/data/
 └── user_{id}/          # Per-user directories
     └── project_{id}/   # Per-project directories
         ├── source/     # Source dataset
-        ├── target/     # Target dataset (optional)
+        ├── target/     # Target dataset
         ├── metadata/   # Clinical metadata
         └── job_{id}/   # Job-specific results
 ```
@@ -347,21 +347,6 @@ Default storage limit: **20GB per user** (configurable via `MAX_STORAGE_BYTES`)
 5. **Regularly update dependencies** - Check for security vulnerabilities
 6. **Limit storage quotas** - Prevent disk exhaustion attacks
 7. **Implement rate limiting** - Protect against brute force attacks
-
----
-
-## Citation
-
-If you use CancerSubtyper in your research, please cite:
-
-```bibtex
-@article{bctypefinder2025,
-  title={BCtypeFinder: Deep Learning-Based Breast Cancer Subtype Prediction},
-  journal={Genetic Testing and Molecular Biomarkers},
-  year={2025},
-  url={https://www.liebertpub.com/doi/abs/10.1177/15578666251380233}
-}
-```
 
 ---
 
