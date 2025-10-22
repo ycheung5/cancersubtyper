@@ -1197,14 +1197,20 @@ def run_cancersubminer(
     # ================================
     print("Creating UMAP data")
 
+    umap_raw_x = raw_x.copy()
+    umap_raw_target_x = raw_target_x.copy()
+    umap_raw_x['subtype'] = raw_y['subtype'].replace(subtype_info['subtype'])
+    umap_raw_target_x['subtype'] = 'Unknown'
+    umap_combined = pd.concat([umap_raw_x, umap_raw_target_x])
+
     # Initialize UMAP reducer
     reducer = umap.UMAP(n_components=2, random_state=42)
 
     # Generate UMAP for Uncorrected Data
-    uncorrected = combined.copy().drop(columns=['Batch', 'subtype'], errors='ignore')
+    uncorrected = umap_combined.copy().drop(columns=['Batch', 'subtype'], errors='ignore')
     uncorrected_umap_embedding = reducer.fit_transform(uncorrected)
     uncorrected_umap_df = pd.DataFrame(uncorrected_umap_embedding, columns=['x', 'y'], index=uncorrected.index)
-    uncorrected_umap_df[['Batch', 'subtype']] = combined[['Batch', 'subtype']]
+    uncorrected_umap_df[['Batch', 'subtype']] = umap_combined[['Batch', 'subtype']]
     uncorrected_umap_df.to_csv(os.path.join(result_dir, "uncorrected_umap_embedding.csv"))
     # for the batch != Source, their subtype should be Unknown. for the batch == Source, their subtype should be the original
 

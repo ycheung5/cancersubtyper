@@ -49,7 +49,7 @@ const ModelStructure = () => {
                         <h3 className="text-2xl font-semibold mb-6 text-red-500">
                             CancerSubminer
                         </h3>
-                        <a href={csms} target="_blank" rel="noopener noreferrer">
+                        <a href={"https://www.biorxiv.org/content/10.1101/2025.10.17.682936v1"} target="_blank" rel="noopener noreferrer">
                             <img
                                 src={csms}
                                 alt="CancerSubminer Model Structure"

@@ -152,8 +152,8 @@ def umap_plot(job_id: int, option: str, db: Session, filter_source: bool = False
     file_path = os.path.join(get_result_path(job_id, db), f"{option}_umap_embedding.csv")
     umap_df = load_csv_or_raise(file_path)
 
-    if filter_source:
-        umap_df = umap_df[umap_df["Batch"] == "Source"]
+    # if filter_source:
+    #     umap_df = umap_df[umap_df["Batch"] == "Source"]
 
     return [
         UMAPPlotResponse(
@@ -467,8 +467,8 @@ def _umap_plot_from_dir(base_dir: str, option: str, filter_source: bool = False)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=f"Invalid option '{option}'")
     file_path = os.path.join(base_dir, f"{option}_umap_embedding.csv")
     df = load_csv_or_raise(file_path)
-    if filter_source:
-        df = df[df["Batch"] == "Source"]
+    # if filter_source:
+    #     df = df[df["Batch"] == "Source"]
     return [UMAPPlotResponse(sample_id=str(i), x=r.x, y=r.y, batch=r.Batch, subtype=r.subtype) for i, r in df.iterrows()]
 
 def _km_plot_options_from_dir(base_dir: str):
