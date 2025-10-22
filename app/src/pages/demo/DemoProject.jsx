@@ -19,7 +19,7 @@ import {AiOutlineFileText} from "react-icons/ai";
 import JobStatusBadge from "../../components/project/job/JobStatusBadge.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {showToast} from "../../redux/toastSlice.jsx";
-import {downloadExampleResults} from "../../redux/jobSlice.jsx";
+import {downloadExampleResults, downloadExampleDataset} from "../../redux/jobSlice.jsx";
 
 const DemoProject = () => {
     const navigate = useNavigate();
@@ -46,6 +46,23 @@ const DemoProject = () => {
             .catch((error) => {
                 dispatch(showToast({ 
                     message: error || "Failed to download example results", 
+                    type: "error" 
+                }));
+            });
+    }
+
+    const downloadDatasetHandler = (datasetType) => {
+        dispatch(downloadExampleDataset(datasetType))
+            .unwrap()
+            .then(() => {
+                dispatch(showToast({ 
+                    message: `Example ${datasetType} dataset downloaded successfully`, 
+                    type: "success" 
+                }));
+            })
+            .catch((error) => {
+                dispatch(showToast({ 
+                    message: error || "Failed to download example dataset", 
                     type: "error" 
                 }));
             });
@@ -190,6 +207,77 @@ const DemoProject = () => {
                                             <span>Demo File.csv</span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-5 bg-base-200 rounded-lg shadow-md">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold text-base-content flex items-center gap-2">
+                                    <FaFileDownload className="text-primary" />
+                                    Download Example Datasets
+                                </h2>
+                                <div className="text-sm text-base-content/70">
+                                    Get sample data to try the platform
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Source Dataset */}
+                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-lg font-medium text-base-content">Source Dataset</h3>
+                                        <FaFileCsv className="text-blue-600 text-xl" />
+                                    </div>
+                                    <p className="text-sm text-base-content/70 mb-3">
+                                        Labeled training data with known subtypes
+                                    </p>
+                                    <button
+                                        className="btn btn-sm btn-outline btn-primary w-full flex items-center justify-center"
+                                        onClick={() => downloadDatasetHandler('source')}
+                                        disabled={jobStatus === 'loading'}
+                                    >
+                                        <FaFileDownload className="mr-2" />
+                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
+                                    </button>
+                                </div>
+
+                                {/* Target Dataset */}
+                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-lg font-medium text-base-content">Target Dataset</h3>
+                                        <FaFileCsv className="text-green-600 text-xl" />
+                                    </div>
+                                    <p className="text-sm text-base-content/70 mb-3">
+                                        Unlabeled data for subtyping prediction
+                                    </p>
+                                    <button
+                                        className="btn btn-sm btn-outline btn-success w-full flex items-center justify-center"
+                                        onClick={() => downloadDatasetHandler('target')}
+                                        disabled={jobStatus === 'loading'}
+                                    >
+                                        <FaFileDownload className="mr-2" />
+                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
+                                    </button>
+                                </div>
+
+                                {/* Metadata Dataset */}
+                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-lg font-medium text-base-content">Metadata</h3>
+                                        <FaFileCsv className="text-purple-600 text-xl" />
+                                    </div>
+                                    <p className="text-sm text-base-content/70 mb-3">
+                                        Sample metadata and annotations
+                                    </p>
+                                    <button
+                                        className="btn btn-sm btn-outline btn-info w-full flex items-center justify-center"
+                                        onClick={() => downloadDatasetHandler('metadata')}
+                                        disabled={jobStatus === 'loading'}
+                                    >
+                                        <FaFileDownload className="mr-2" />
+                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
+                                    </button>
                                 </div>
                             </div>
                         </div>

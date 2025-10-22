@@ -12,7 +12,7 @@ from repository.job_repository import JobRepository
 from repository.model_repository import ModelRepository
 from repository.project_repository import ProjectRepository
 from schemas.jobs import JobCreate, JobResponse
-from util.path_untils import job_result_path, example_result_path
+from util.path_untils import job_result_path, example_result_path, example_base_dir
 
 router = APIRouter(prefix="/job", tags=["job"])
 
@@ -161,6 +161,53 @@ def get_example_results(model: str):
         zip_path,
         media_type="application/zip",
         filename=f"{model}_example_results.zip"
+    )
+
+
+@router.get("/examples/datasets/{dataset_type}", status_code=HTTPStatus.OK)
+def download_example_dataset(dataset_type: str):
+    """
+    Endpoint to download example datasets (source, target, metadata).
+    Dataset type should be 'source', 'target', or 'metadata'.
+    No authentication required for demo/example downloads.
+    """
+    
+    # Validate dataset type parameter
+    if dataset_type not in ["source", "target", "metadata"]:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST, 
+            detail="Dataset type must be 'source', 'target', or 'metadata'"
+        )
+    
+    # Get the example data path
+    example_data_dir = os.path.join(example_base_dir(), "data")
+    
+    # Map dataset types to file names
+    file_mapping = {
+        "source": "example_source.csv",
+        "target": "example_target.csv", 
+        "metadata": "example_metadata.csv"
+    }
+    
+    file_name = file_mapping[dataset_type]
+    file_path = os.path.join(example_data_dir, file_name)
+    
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, 
+            detail=f"Example {dataset_type} dataset not found"
+        )
+    
+    # All files are CSV format
+    media_type = "text/csv"
+    download_name = file_name
+    
+    # Return the file for download
+    return FileResponse(
+        file_path,
+        media_type=media_type,
+        filename=download_name
     )
 
 

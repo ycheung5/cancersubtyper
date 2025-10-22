@@ -174,9 +174,13 @@ ehthumbs.db
 Desktop.ini
 
 # Data directories (sensitive data should not be committed)
-data/
+# Ignore user-specific data directories
+data/user_*/
+# Allow global example data to be tracked
 !data/global/
-!data/global/**
+!data/global/sample/
+!data/global/sample/data/
+!data/global/sample/data/*
 
 # Database files
 *.db
