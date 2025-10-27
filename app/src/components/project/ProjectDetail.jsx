@@ -153,7 +153,7 @@ const ProjectDetail = ({ project }) => {
 
                     <div className="flex gap-2">
                         <a
-                            href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                            href="https://drive.google.com/file/d/13vFp4futa529QYw__qGMYnr7sRj_ua2W/view?usp=drive_link"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-outline btn-success flex items-center"

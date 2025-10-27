@@ -89,7 +89,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                                 Template
                             </button>
                             <a
-                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                href="https://drive.google.com/file/d/1fa3FSblDblsuTAtQ6jXLJWIQJkXgquys/view?usp=drive_link"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn btn-sm btn-outline btn-success flex items-center"
@@ -127,7 +127,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                                 Template
                             </button>
                             <a
-                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                href="https://drive.google.com/file/d/1ex9YCVAXLdgINDltX91HLllFNP5nrpLC/view?usp=drive_link"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn btn-sm btn-outline btn-success flex items-center"
