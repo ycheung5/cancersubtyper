@@ -19,7 +19,7 @@ import {AiOutlineFileText} from "react-icons/ai";
 import JobStatusBadge from "../../components/project/job/JobStatusBadge.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {showToast} from "../../redux/toastSlice.jsx";
-import {downloadExampleResults, downloadExampleDataset} from "../../redux/jobSlice.jsx";
+import {downloadExampleResults} from "../../redux/jobSlice.jsx";
 
 const DemoProject = () => {
     const navigate = useNavigate();
@@ -38,35 +38,89 @@ const DemoProject = () => {
         dispatch(downloadExampleResults(model))
             .unwrap()
             .then(() => {
-                dispatch(showToast({ 
-                    message: `${model} example results downloaded successfully`, 
-                    type: "success" 
+                dispatch(showToast({
+                    message: `${model} example results downloaded successfully`,
+                    type: "success"
                 }));
             })
             .catch((error) => {
-                dispatch(showToast({ 
-                    message: error || "Failed to download example results", 
-                    type: "error" 
+                dispatch(showToast({
+                    message: error || "Failed to download example results",
+                    type: "error"
                 }));
             });
     }
 
-    const downloadDatasetHandler = (datasetType) => {
-        dispatch(downloadExampleDataset(datasetType))
-            .unwrap()
-            .then(() => {
-                dispatch(showToast({ 
-                    message: `Example ${datasetType} dataset downloaded successfully`, 
-                    type: "success" 
-                }));
-            })
-            .catch((error) => {
-                dispatch(showToast({ 
-                    message: error || "Failed to download example dataset", 
-                    type: "error" 
-                }));
-            });
-    }
+    const handleGetTemplate = () => {
+        // Create CSV template content
+        const csvContent = "sample_id,os_time,status\n" +
+            "sample_001,365,1\n" +
+            "sample_002,180,2\n" +
+            "sample_003,730,1";
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'metadata_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    const handleGetSourceTemplate = () => {
+        // Create source template - CpG methylation data format with subtype labels
+        const csvContent = "sample_id,cg00000029,cg00000108,cg00000109,cg00000165,cg00000236,subtype\n" +
+            "sample_001,0.1234,0.5678,0.9012,0.3456,0.7890,LumA\n" +
+            "sample_002,0.2345,0.6789,0.0123,0.4567,0.8901,LumB\n" +
+            "sample_003,0.3456,0.7890,0.1234,0.5678,0.9012,Her2\n" +
+            "sample_004,0.4567,0.8901,0.2345,0.6789,0.0123,Basal\n" +
+            "sample_005,0.5678,0.9012,0.3456,0.7890,0.1234,Normal-like";
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'source_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    const handleGetTargetTemplate = () => {
+        // Create target template - CpG methylation data format with batch labels
+        const csvContent = "sample_id,cg00000029,cg00000108,cg00000109,cg00000165,cg00000236,Batch\n" +
+            "sample_001,0.2345,0.6789,0.0123,0.4567,0.8901,Batch_1\n" +
+            "sample_002,0.3456,0.7890,0.1234,0.5678,0.9012,Batch_1\n" +
+            "sample_003,0.4567,0.8901,0.2345,0.6789,0.0123,Batch_2\n" +
+            "sample_004,0.5678,0.9012,0.3456,0.7890,0.1234,Batch_2\n" +
+            "sample_005,0.6789,0.0123,0.4567,0.8901,0.2345,Batch_3";
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'target_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
 
     return (
         <div className="flex justify-center">
@@ -158,6 +212,26 @@ const DemoProject = () => {
                                         className="hidden"
                                         accept=".csv"
                                     />
+
+                                    <button
+                                        className="btn btn-outline btn-info flex items-center"
+                                        onClick={handleGetTemplate}
+                                    >
+                                        <FaFileDownload className="mr-2" />
+                                        <span>Get Template</span>
+                                    </button>
+
+                                    <a
+                                        href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-outline btn-success flex items-center"
+                                        title="Download demo metadata (45 KB)"
+                                    >
+                                        <FaFileDownload className="mr-2" />
+                                        <span>Demo Metadata</span>
+                                    </a>
+
                                     <div className="flex items-center gap-2 text-green-500">
                                         <FaFileCsv className="text-lg" />
                                         <span>Demo File.csv</span>
@@ -185,9 +259,30 @@ const DemoProject = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Source File */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
-                                    <p className="text-lg font-medium">
-                                        <strong>Labeled Data (Source):</strong>
-                                    </p>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <p className="text-lg font-medium">
+                                            <strong>Labeled Data (Source):</strong>
+                                        </p>
+                                        <div className="flex gap-1">
+                                            <button
+                                                className="btn btn-sm btn-outline btn-info flex items-center"
+                                                onClick={handleGetSourceTemplate}
+                                            >
+                                                <FaFileDownload className="mr-1" />
+                                                Template
+                                            </button>
+                                            <a
+                                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-sm btn-outline btn-success flex items-center"
+                                                title="Download demo source data (198.7 MB)"
+                                            >
+                                                <FaFileDownload className="mr-1" />
+                                                Demo
+                                            </a>
+                                        </div>
+                                    </div>
                                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                                         <div className="flex items-center gap-2 text-blue-600">
                                             <FaFileCsv className="text-lg" />
@@ -198,9 +293,30 @@ const DemoProject = () => {
 
                                 {/* Target File */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
-                                    <p className="text-lg font-medium">
-                                        <strong>Unlabeled Data (Target):</strong>
-                                    </p>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <p className="text-lg font-medium">
+                                            <strong>Unlabeled Data (Target):</strong>
+                                        </p>
+                                        <div className="flex gap-1">
+                                            <button
+                                                className="btn btn-sm btn-outline btn-info flex items-center"
+                                                onClick={handleGetTargetTemplate}
+                                            >
+                                                <FaFileDownload className="mr-1" />
+                                                Template
+                                            </button>
+                                            <a
+                                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-sm btn-outline btn-success flex items-center"
+                                                title="Download demo target data (101.9 MB)"
+                                            >
+                                                <FaFileDownload className="mr-1" />
+                                                Demo
+                                            </a>
+                                        </div>
+                                    </div>
                                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                                         <div className="flex items-center gap-2 text-blue-600">
                                             <FaFileCsv className="text-lg" />
@@ -211,76 +327,6 @@ const DemoProject = () => {
                             </div>
                         </div>
 
-                        <div className="p-5 bg-base-200 rounded-lg shadow-md">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold text-base-content flex items-center gap-2">
-                                    <FaFileDownload className="text-primary" />
-                                    Download Example Dataset
-                                </h2>
-                                <div className="text-sm text-base-content/70">
-                                    Get dataset to try the platform
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* Source Dataset */}
-                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-medium text-base-content">Labeled Data (Source)</h3>
-                                        <FaFileCsv className="text-blue-600 text-xl" />
-                                    </div>
-                                    <p className="text-sm text-base-content/70 mb-3">
-                                        Labeled data with known subtypes
-                                    </p>
-                                    <button
-                                        className="btn btn-sm btn-outline btn-primary w-full flex items-center justify-center"
-                                        onClick={() => downloadDatasetHandler('source')}
-                                        disabled={jobStatus === 'loading'}
-                                    >
-                                        <FaFileDownload className="mr-2" />
-                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
-                                    </button>
-                                </div>
-
-                                {/* Target Dataset */}
-                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-medium text-base-content">Unlabeled Data (Target)</h3>
-                                        <FaFileCsv className="text-green-600 text-xl" />
-                                    </div>
-                                    <p className="text-sm text-base-content/70 mb-3">
-                                        Unlabeled data for subtyping prediction
-                                    </p>
-                                    <button
-                                        className="btn btn-sm btn-outline btn-success w-full flex items-center justify-center"
-                                        onClick={() => downloadDatasetHandler('target')}
-                                        disabled={jobStatus === 'loading'}
-                                    >
-                                        <FaFileDownload className="mr-2" />
-                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
-                                    </button>
-                                </div>
-
-                                {/* Metadata Dataset */}
-                                <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-medium text-base-content">Metadata</h3>
-                                        <FaFileCsv className="text-purple-600 text-xl" />
-                                    </div>
-                                    <p className="text-sm text-base-content/70 mb-3">
-                                        Sample metadata and annotations
-                                    </p>
-                                    <button
-                                        className="btn btn-sm btn-outline btn-info w-full flex items-center justify-center"
-                                        onClick={() => downloadDatasetHandler('metadata')}
-                                        disabled={jobStatus === 'loading'}
-                                    >
-                                        <FaFileDownload className="mr-2" />
-                                        {jobStatus === 'loading' ? 'Downloading...' : 'Download CSV'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
 
                         <div className="p-6 bg-base-200 rounded-lg shadow-md space-y-5">
                             <div className="flex flex-wrap justify-between items-center gap-4">

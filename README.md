@@ -655,6 +655,17 @@ These are mainly for developers, but you can explore them if curious:
 3. Go to http://localhost:5173
 4. Create an account and start uploading data!
 
+**Getting Demo Data and Templates:**
+- Use the **"Get Template"** buttons (available in both regular projects and demo projects) to download CSV templates for proper formatting:
+  - **Metadata template**: Sample clinical data format (sample_id, os_time, status)
+  - **Source template**: CpG methylation data format with subtype labels
+  - **Target template**: CpG methylation data format with batch labels
+- Use the **"Download Demo Data"** buttons (available in both regular projects and demo projects) to get sample datasets directly from Google Drive:
+  - **Source data** (198.7 MB compressed): TCGA-BRCA methylation data with subtype labels
+  - **Target data** (101.9 MB compressed): Multiple breast cancer datasets for prediction
+  - **Metadata** (45 KB): Sample clinical annotations
+- Demo datasets are pre-compressed in `.gz` format and ready to upload
+
 ---
 
 ## Development

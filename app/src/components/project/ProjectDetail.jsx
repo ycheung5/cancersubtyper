@@ -151,6 +151,18 @@ const ProjectDetail = ({ project }) => {
                         <span>Get Template</span>
                     </button>
 
+                    <div className="flex gap-2">
+                        <a
+                            href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline btn-success flex items-center"
+                        >
+                            <FaDownload className="mr-2" />
+                            <span>Demo Data</span>
+                        </a>
+                    </div>
+
                     {project.metadata_file ? (
                         <div className="flex items-center gap-2 text-green-500">
                             <FaFileCsv className="text-lg" />

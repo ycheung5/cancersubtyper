@@ -80,13 +80,25 @@ const SampleDetail = ({ projectId, target, source }) => {
                         <p className="text-lg font-medium">
                             <strong>Labeled Data (Source):</strong>
                         </p>
-                        <button
-                            className="btn btn-sm btn-outline btn-info flex items-center"
-                            onClick={handleGetSourceTemplate}
-                        >
-                            <FaDownload className="mr-1" />
-                            Template
-                        </button>
+                        <div className="flex gap-1">
+                            <button
+                                className="btn btn-sm btn-outline btn-info flex items-center"
+                                onClick={handleGetSourceTemplate}
+                            >
+                                <FaDownload className="mr-1" />
+                                Template
+                            </button>
+                            <a
+                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm btn-outline btn-success flex items-center"
+                                title="Download demo source data (198.7 MB)"
+                            >
+                                <FaDownload className="mr-1" />
+                                Demo
+                            </a>
+                        </div>
                     </div>
                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                         {source ? (
@@ -106,13 +118,25 @@ const SampleDetail = ({ projectId, target, source }) => {
                         <p className="text-lg font-medium">
                             <strong>Unlabeled Data (Target):</strong>
                         </p>
-                        <button
-                            className="btn btn-sm btn-outline btn-info flex items-center"
-                            onClick={handleGetTargetTemplate}
-                        >
-                            <FaDownload className="mr-1" />
-                            Template
-                        </button>
+                        <div className="flex gap-1">
+                            <button
+                                className="btn btn-sm btn-outline btn-info flex items-center"
+                                onClick={handleGetTargetTemplate}
+                            >
+                                <FaDownload className="mr-1" />
+                                Template
+                            </button>
+                            <a
+                                href="https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm btn-outline btn-success flex items-center"
+                                title="Download demo target data (101.9 MB)"
+                            >
+                                <FaDownload className="mr-1" />
+                                Demo
+                            </a>
+                        </div>
                     </div>
                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                         {target ? (

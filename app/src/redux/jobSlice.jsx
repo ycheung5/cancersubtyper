@@ -44,13 +44,6 @@ export const downloadExampleResults = createAsyncThunk('job/exampleResults', asy
         .catch(err => rejectWithValue(err.response?.data?.detail || 'Failed to download example results'));
 });
 
-export const downloadExampleDataset = createAsyncThunk('job/exampleDataset', async (datasetType, { rejectWithValue }) => {
-    return axios.get(`${base_url}/job/examples/datasets/${datasetType}`, {
-        responseType: 'blob',
-    })
-        .then(res => ({ data: res.data, datasetType }))
-        .catch(err => rejectWithValue(err.response?.data?.detail || 'Failed to download example dataset'));
-});
 
 const jobSlice = createSlice({
     name: 'job',
@@ -104,41 +97,14 @@ const jobSlice = createSlice({
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             })
-            .addCase(downloadExampleDataset.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-
-                // Determine file type and name based on dataset type
-                const datasetType = action.payload.datasetType;
-                let fileType, fileName;
-                
-                if (datasetType === 'metadata') {
-                    fileType = 'text/csv';
-                    fileName = 'example_metadata.csv';
-                } else {
-                    fileType = 'text/csv';
-                    fileName = `example_${datasetType}.csv`;
-                }
-
-                const blob = new Blob([action.payload.data], { type: fileType });
-                const url = window.URL.createObjectURL(blob);
-
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            })
             .addMatcher(
-                isAnyOf(getJobList.pending, createJob.pending, downloadResults.pending, downloadExampleResults.pending, downloadExampleDataset.pending),
+                isAnyOf(getJobList.pending, createJob.pending, downloadResults.pending, downloadExampleResults.pending),
                 (state) => {
                     state.status = 'loading';
                 }
             )
             .addMatcher(
-                isAnyOf(getJobList.rejected, createJob.rejected, downloadResults.rejected, downloadExampleResults.rejected, downloadExampleDataset.rejected),
+                isAnyOf(getJobList.rejected, createJob.rejected, downloadResults.rejected, downloadExampleResults.rejected),
                 (state, action) => {
                     state.status = 'failed';
                     state.error = action?.payload;

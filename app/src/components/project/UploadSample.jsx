@@ -98,7 +98,7 @@ const UploadSample = ({ projectId, onClose }) => {
                 <div className="space-y-4">
                     <div className="alert alert-info">
                         <p className="text-sm">
-                            <strong>Note:</strong> Files must be compressed in .gz format. Use the template buttons to download CSV templates, then compress them with gzip before uploading.
+                            <strong>Note:</strong> Files must be compressed in .gz format. Use the template buttons to download CSV templates, or download demo datasets directly from Google Drive, then compress them with gzip before uploading.
                         </p>
                     </div>
                     
