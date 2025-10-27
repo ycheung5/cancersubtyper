@@ -2,13 +2,11 @@
 
 ## Abstract
 
-**CancerSubtyper** is a web-based platform for deep learning-based cancer subtyping using DNA methylation data. It supports both supervised and semi-supervised workflows for predicting or discovering molecular subtypes. Users can upload methylation datasets (with or without subtype labels), run models, and explore interactive visualizations such as UMAP projections, CpG heatmaps, and Kaplan-Meier survival plots.
+**CancerSubtyper** is an end-to-end computational framework for deep learning–based cancer subtyping using DNA methylation data, which is accessible through an intuitive web interface designed to support interactive exploration and downstream analysis. It supports two complementary models—a semi-supervised classifier for cancers with well-defined subtypes, and a hybrid framework that enables the discovery of novel subtypes. CancerSubtyper provides automated data processing, feature selection, batch effect correction, and cancer subtyping along with extensive interactive visualizations for biological interpretation and clinical relevance assessment.
 
 The platform currently includes:
-- **BCtypeFinder** – a supervised classifier trained on TCGA-BRCA for intrinsic breast cancer subtype prediction.
-- **CancerSubminer** – a semi-supervised model that performs subtype discovery or refinement with optional clustering constraints.
-
-This tool is designed to be accessible to non-programmers while remaining robust enough for advanced molecular analysis.
+- **[BCtypeFinder](https://www.liebertpub.com/doi/abs/10.1177/15578666251380233?casa_token=FrsS1pL4s9EAAAAA%3ALj5R2mvC-Fvwf6j1QgLUi7qvyXVJ65__j5N-VfGLV9uNG3bmpppJMNV-xpmgqKSOuVJIk5Svw50)** – a semi-supervised classification approach optimized for cancers with well-established subtypes.
+- **[CancerSubminer](https://www.biorxiv.org/content/10.1101/2025.10.17.682936v1)** – an integrative framework that combines supervised and unsupervised learning to facilitate the discovery of novel subgroups in less-characterized cancers.
 
 ---
 
@@ -30,18 +28,16 @@ This tool is designed to be accessible to non-programmers while remaining robust
 
 ### Software Dependencies
 
-Before you begin, you need to install the following software on your computer:
-
 - **Docker** (version 20.10 or higher) - A platform that allows you to run applications in containers
 - **Docker Compose** (version 2.0 or higher) - A tool for defining and running multi-container Docker applications
-- **NVIDIA Docker Runtime** (for GPU support - optional but recommended) - Only needed if you have an NVIDIA GPU
+- **NVIDIA Docker Runtime** (*optional*) - Only needed if you have an NVIDIA GPU (for GPU support)
 
 ### Hardware Recommendations
 
 - **CPU**: 4 or more cores
 - **RAM**: At least 16GB (32GB is recommended for best performance)
 - **Disk**: At least 50GB of free storage space (more space for larger datasets)
-- **GPU**: NVIDIA GPU with CUDA support (optional, speeds up model training/inference)
+- **GPU** (*optional*): NVIDIA GPU with CUDA support (speeds up model training)
 
 ---
 
@@ -66,6 +62,54 @@ CancerSubtyper is a multi-service application consisting of:
 
 Choose the instructions that match your operating system:
 
+#### **For Windows:**
+
+1. **Install WSL2 (Windows Subsystem for Linux):**
+   - Open PowerShell as Administrator (right-click Start menu → Windows PowerShell (Admin))
+   - Copy and paste this command, then press Enter:
+     ```powershell
+     wsl --install
+     ```
+   - Restart your computer when prompted
+
+2. **After restart, install Docker Desktop:**
+   - Go to: https://www.docker.com/products/docker-desktop/
+   - Click "Download for Windows"
+   - Open the downloaded file and follow the installation wizard
+   - Check the box for "Use WSL 2 instead of Hyper-V" during installation
+
+3. **Verify installation:**
+   - Open a WSL terminal or PowerShell
+   - Type: `docker --version`
+   - Press Enter
+   - You should see a version number
+
+#### **For macOS:**
+
+1. **Download Docker Desktop for Mac:**
+   - Go to: https://www.docker.com/products/docker-desktop/
+   - Click the big blue button that says "Download for Mac"
+   - Choose the version for your Mac chip:
+     - If you have an Apple Silicon Mac (M1, M2, M3), choose "Mac with Apple chip"
+     - If you have an Intel Mac, choose "Mac with Intel chip"
+
+2. **Open the downloaded file** (it will be in your Downloads folder)
+
+3. **Drag the Docker icon** into your Applications folder
+
+4. **Open Docker Desktop** from your Applications folder
+
+5. **Follow the setup wizard:**
+   - Click "Open" when asked about security
+   - You may be asked to enter your Mac password to grant permissions
+   - Click "Finish" when setup completes
+
+6. **Verify installation:**
+   - Open a Terminal (press Command + Space, type "Terminal", press Enter)
+   - Type: `docker --version`
+   - Press Enter
+   - You should see a version number like: `Docker version 24.0.0`
+     
 #### **For Linux (Ubuntu/Debian):**
 
 We recommend using the official Docker installation script, which is the easiest method:
@@ -110,53 +154,6 @@ We recommend using the official Docker installation script, which is the easiest
 
    If successful, you'll see a message saying "Hello from Docker!"
 
-#### **For macOS:**
-
-1. **Download Docker Desktop for Mac:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click the big blue button that says "Download for Mac"
-   - Choose the version for your Mac chip:
-     - If you have an Apple Silicon Mac (M1, M2, M3), choose "Mac with Apple chip"
-     - If you have an Intel Mac, choose "Mac with Intel chip"
-
-2. **Open the downloaded file** (it will be in your Downloads folder)
-
-3. **Drag the Docker icon** into your Applications folder
-
-4. **Open Docker Desktop** from your Applications folder
-
-5. **Follow the setup wizard:**
-   - Click "Open" when asked about security
-   - You may be asked to enter your Mac password to grant permissions
-   - Click "Finish" when setup completes
-
-6. **Verify installation:**
-   - Open a Terminal (press Command + Space, type "Terminal", press Enter)
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number like: `Docker version 24.0.0`
-
-#### **For Windows:**
-
-1. **Install WSL2 (Windows Subsystem for Linux):**
-   - Open PowerShell as Administrator (right-click Start menu → Windows PowerShell (Admin))
-   - Copy and paste this command, then press Enter:
-     ```powershell
-     wsl --install
-     ```
-   - Restart your computer when prompted
-
-2. **After restart, install Docker Desktop:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click "Download for Windows"
-   - Open the downloaded file and follow the installation wizard
-   - Check the box for "Use WSL 2 instead of Hyper-V" during installation
-
-3. **Verify installation:**
-   - Open a WSL terminal or PowerShell
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number
 
 ### Step 2: Install Docker Compose
 
@@ -208,7 +205,7 @@ Both commands should return version numbers. If you see any errors, refer to the
 
 ---
 
-## Installation & Setup
+## Installation & Setup for CancerSubtyper
 
 ### 1. Clone the Repository
 
