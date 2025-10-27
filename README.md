@@ -338,14 +338,25 @@ python -c "import secrets; print(secrets.token_hex(64))"
 # Replace 'your_secure_password_here' with the SAME password you used in the root .env file
 SQLALCHEMY_DATABASE_URL=postgresql://postgres:your_secure_password_here@db/cancersubtyper
 
-# JWT Secret - paste the long random string you just generated in Step 3
+# JWT Settings
 JWT_SECRET_KEY=your_jwt_secret_key_here
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
 
-# Redis broker URL (don't change this)
+# Storage
+MAX_STORAGE_BYTES=21474836480  # 20GB in bytes
+DATA_DIR=/app/data
+FILE_WRITER_CHUNK_SIZE=1
+
+# Celery & Redis
 CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
 
-# Storage limits - 20GB in bytes
-MAX_STORAGE_BYTES=21474836480
+# Path
+CPG_INFO_FILE=/app/data/global/cpg_info.csv
+NEMO_SCRIPT_FILE=/app/tasks/helper_scripts/run_nemo.R
+SAMPLE_FILE=/app/data/global/sample
 ```
 
 **Step 5:** Replace the placeholders in the `api/.env` file:
@@ -355,10 +366,27 @@ MAX_STORAGE_BYTES=21474836480
 **Example of what your final file should look like:**
 
 ```env
-SQLALCHEMY_DATABASE_URL=postgresql://postgres:MySecurePassword123!@db/cancersubtyper
-JWT_SECRET_KEY=a3f5b7c9d1e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4c6d8e0f2a4
+SQLALCHEMY_DATABASE_URL=postgresql://postgres:postgres@db/cancersubtyper
+
+# JWT Settings
+JWT_SECRET_KEY=7f3e9a2b8c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7asbv44321244d2e3f4a5b6c7d8e9f0a1
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Storage
+MAX_STORAGE_BYTES=21474836480  # 20GB in bytes
+DATA_DIR=/app/data
+FILE_WRITER_CHUNK_SIZE=1
+
+# Celery & Redis
 CELERY_BROKER_URL=redis://redis:6379/0
-MAX_STORAGE_BYTES=21474836480
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+# Path
+CPG_INFO_FILE=/app/data/global/cpg_info.csv
+NEMO_SCRIPT_FILE=/app/tasks/helper_scripts/run_nemo.R
+SAMPLE_FILE=/app/data/global/sample
 ```
 
 **Step 6:** Save and close the file:
