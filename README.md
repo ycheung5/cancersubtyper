@@ -1,6 +1,5 @@
-# CancerSubtyper
+# CancerSubtyper: A Deep Learning Framework for Cancer Subtyping Through DNA Methylation Data
 
-## Abstract
 
 **CancerSubtyper** is an end-to-end computational framework for deep learning–based cancer subtyping using DNA methylation data, which is accessible through an intuitive web interface designed to support interactive exploration and downstream analysis. It supports two complementary models—a semi-supervised classifier for cancers with well-defined subtypes, and a hybrid framework that enables the discovery of novel subtypes. CancerSubtyper provides automated data processing, feature selection, batch effect correction, and cancer subtyping along with extensive interactive visualizations for biological interpretation and clinical relevance assessment.
 
@@ -14,7 +13,6 @@ The platform currently includes:
 
 - [Requirements](#requirements)
 - [Architecture](#architecture)
-- [Installing Docker and Docker Compose](#installing-docker-and-docker-compose)
 - [Installation & Setup](#installation--setup)
 - [Running the Application](#running-the-application)
 - [Accessing Services](#accessing-services)
@@ -88,7 +86,7 @@ You need to create configuration files (called `.env` files) for the application
 
 &nbsp;
 
-**Step 1:** Navigate to the project root directory (you should already be there after cloning):
+**Step 1:** Navigate to the project root directory:
 
 ```bash
 pwd  # This shows your current directory - should show the cancersubtyper folder
@@ -158,7 +156,11 @@ cd api
 ```
 **Step 2:** Generate a JWT Secret Key first. This is a long random string used for security.
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+
+&nbsp;
+
 Open a NEW terminal window (keep the editor open). Run one of these commands:
 
 ```bash
@@ -169,33 +171,41 @@ python3 -c "import secrets; print(secrets.token_hex(64))"
 openssl rand -hex 64
 ```
 
-**On Windows (WSL):**
+</details>
+
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
 Open a NEW terminal window and run:
 
 ```bash
 python3 -c "import secrets; print(secrets.token_hex(64))"
 ```
 
-**On Windows (PowerShell):**
-```powershell
-python -c "import secrets; print(secrets.token_hex(64))"
-```
+</details>
 
 **Copy the entire output** (it will be a long string of letters and numbers like `a3f5b7c9...`). You'll paste this in the next step.
 
 **Step 3:** Create a new `.env` file:
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+
+&nbsp;
+
 ```bash
 nano .env
 ```
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
+</details>
 
-**On Windows (using Notepad):**
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
 - Open Notepad
 - Click File → Save As
 - Navigate to the `api` folder inside your cancersubtyper folder
@@ -203,6 +213,7 @@ nano .env
 - In the "Save as type" dropdown, select "All Files (*.*)"
 - Click Save
 
+</details>
 
 **Step 4:** Add this content to the `api/.env` file and customize:
 
@@ -289,23 +300,30 @@ cd app
 
 **Step 2:** Create a new `.env` file:
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+
+&nbsp;
+
 ```bash
 nano .env
 ```
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
+</details>
 
-**On Windows (using Notepad):**
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
 - Open Notepad
 - Click File → Save As
-- Navigate to the `app` folder inside your cancersubtyper folder
+- Navigate to the `api` folder inside your cancersubtyper folder
 - In the "File name" box, type: `.env`
 - In the "Save as type" dropdown, select "All Files (*.*)"
 - Click Save
+
+</details>
 
 **Step 3:** Add the following content to the `app/.env` file:
 
@@ -319,14 +337,7 @@ VITE_POLL_PREPROCESSING=60000
 VITE_POLL_RUNNING=60000
 ```
 
-**⚠️ Important:** 
-- For development on your local computer, use `http://localhost:8000` as shown above
-- For production deployment, change `VITE_API_BASE_URL` to your actual API domain (e.g., `https://api.yourdomain.com`)
-- You can leave the polling intervals as they are unless you have specific requirements
-
-**Step 4:** Save and close the file:
-- **nano:** Press `Ctrl+X`, then `Y`, then Enter
-- **Notepad:** Click File → Save (or press Ctrl+S)
+**Step 4:** Save and close the file.
 
 **Step 5:** Go back to the project root directory (this is important for the next step):
 
@@ -382,8 +393,6 @@ This should show something ending with `cancersubtyper`. If not, navigate there:
 cd path/to/your/cancersubtyper
 ```
 
-### Development Mode (with hot reload)
-
 **Step 1:** Run the application with this command:
 
 ```bash
@@ -419,29 +428,6 @@ You can now access the application at http://localhost:5173
 - Press `Ctrl+C` in the terminal
 - Or in a new terminal window, run: `docker compose down`
 
-### Production Mode
-
-**⚠️ Production Mode is for deploying the application to a server, not for local development.**
-
-If you're just getting started and testing the application on your own computer, you don't need this section. Continue with the next section "Accessing Services" instead.
-
-If you need to deploy this to a production server, here are the basic steps:
-
-1. **Build optimized frontend:**
-   ```bash
-   cd app
-   npm run build
-   cd ..
-   ```
-
-2. **Configure nginx service** in `compose.yml` (currently commented out)
-
-3. **Run in detached mode** (runs in background):
-   ```bash
-   docker compose up -d
-   ```
-
-**Note:** Production deployment is an advanced topic. If you're a beginner, we recommend sticking with Development Mode for now.
 
 ### With GPU Support (Advanced)
 
