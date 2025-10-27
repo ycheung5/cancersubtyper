@@ -901,12 +901,6 @@ This work was supported by:
 
 ---
 
-## License
-
-[Add your license information here]
-
----
-
 ## Contact
 
 For questions, issues, or contributions, please [open an issue](https://github.com/your-username/cancersubtyper/issues) on GitHub.
