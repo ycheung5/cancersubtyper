@@ -15,10 +15,10 @@ The platform currently includes:
 - [Architecture](#architecture)
 - [Installation & Setup](#installation--setup)
 - [Running the Application](#running-the-application)
-- [Accessing Services](#accessing-services)
+- [DEMO dataset](#demo-dataset)
 - [Development](#development)
 - [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [Contact](#contact)
 
 ---
 
@@ -404,7 +404,9 @@ docker compose up --build
 - `up` - starts the containers
 - `--build` - rebuilds the images to include any code changes
 
-**Step 2:** You'll see lots of output scrolling in your terminal. This is normal! Docker is:
+**Step 2:** You'll see lots of output scrolling in your terminal. This is normal! 
+<!--
+Docker is:
 1. Building all Docker images (this downloads necessary software like Python, Node.js, databases, etc.)
 2. Starting PostgreSQL database
 3. Starting Redis (message queue)
@@ -412,7 +414,7 @@ docker compose up --build
 5. Starting Frontend web server
 6. Starting Celery workers (for background tasks)
 7. Enabling hot-reload (🧾 automatic updates when you change code)
-
+-->
 **⚠️ First-time setup:** This step will take several minutes the first time (5-15 minutes) because Docker needs to download all the required software. Subsequent startups will be much faster (30-60 seconds).
 
 **Step 3:** You'll know everything is ready when you see messages like:
@@ -420,7 +422,12 @@ docker compose up --build
 - "Started server process"
 - "Frontend development server running"
 
-You can now access the application at http://localhost:5173
+You can now access the application at **http://localhost:5173**. If you successfully installed, you will see the below main page:
+
+&nbsp;
+
+<img width="1297" height="927" alt="image" src="https://github.com/user-attachments/assets/5eee8f4a-703f-40fd-881b-847a7003f943" />
+
 
 **Tip:** Keep this terminal window open. If you close it, the application will stop running.
 
@@ -428,8 +435,15 @@ You can now access the application at http://localhost:5173
 - Press `Ctrl+C` in the terminal
 - Or in a new terminal window, run: `docker compose down`
 
+**To restart the application:**
+```bash
+docker compose up
+```
 
-### With GPU Support (Advanced)
+<details>
+<summary> <strong>With GPU Support (Advanced)</strong> </summary>
+
+&nbsp;
 
 **⚠️ GPU support is currently disabled by default in `compose.yml`**
 
@@ -464,8 +478,12 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
 - **flower**: GPU support is commented out (lines 90-98)
 - **To enable:** Uncomment the `deploy` sections in `compose.yml`
 
-**Note:** The application will work fine without GPU support, but model training and inference will be slower.
+</details>
 
+**Note:** Cancersubtyper can be run without GPU support.
+
+
+<!--
 ---
 
 ## Accessing Services
@@ -479,6 +497,7 @@ Once the application is running, you can access different parts of the system:
 - **Description:** This is the main user interface where you'll upload data, run jobs, and view results
 - **How to access:** Open your web browser and go to `http://localhost:5173`
 - **First time:** You'll need to create an account or sign in
+
 
 ### 🔧 Developer Tools (Optional)
 
@@ -510,6 +529,8 @@ These are mainly for developers, but you can explore them if curious:
 - **Tools needed:** Install a database client like pgAdmin or DBeaver
 - **For beginners:** You don't need to access this directly - the web interface handles everything
 
+-->
+
 ### Summary
 
 **To start using the application:**
@@ -518,16 +539,24 @@ These are mainly for developers, but you can explore them if curious:
 3. Go to http://localhost:5173
 4. Create an account and start uploading data!
 
-**Getting Demo Data and Templates:**
+---
+
+## DEMO Dataset
+Breast cancer DNA methylation dataset used in the prototype analysis in CancerSubtyper paper can be downloaded from [here](https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0?usp=sharing).
+- Demo datasets are pre-compressed in `.gz` format and ready to upload
+
+**Getting Demo Data and Templates in CancerSubtyper:**
 - Use the **"Get Template"** buttons (available in both regular projects and demo projects) to download CSV templates for proper formatting:
   - **Metadata template**: Sample clinical data format (sample_id, os_time, status)
   - **Source template**: CpG methylation data format with subtype labels
   - **Target template**: CpG methylation data format with batch labels
+
+&nbsp;
 - Use the **"Download Demo Data"** buttons (available in both regular projects and demo projects) to get sample datasets directly from Google Drive:
-  - **Source data** (198.7 MB compressed): TCGA-BRCA methylation data with subtype labels
-  - **Target data** (101.9 MB compressed): Multiple breast cancer datasets for prediction
-  - **Metadata** (45 KB): Sample clinical annotations
-- Demo datasets are pre-compressed in `.gz` format and ready to upload
+  - **Source data** (198.7 MB compressed): TCGA-BRCA methylation data with subtype labels composed of 1,060 samples profiled using the Illumina Human Infinium 450K and 27K platforms
+  - **Target data** (101.9 MB compressed): Three publicly available breast cancer methylation datasets from GEO (GSE69914, GSE75067, GSE72245)
+  - **Metadata** (45 KB): Sample clinical information used for survival analysis
+
 
 ---
 
@@ -812,8 +841,6 @@ Default storage limit: **20GB per user** (configurable via `MAX_STORAGE_BYTES`)
 
 ---
 
-## Acknowledgments
+## Contact
 
-This work was supported by:
-- U.S. National Science Foundation (NSF) Awards #2004751, #2125798, #2344169, and #2319522
-- National Institutes of Health (NIH) Grant #1R01AI179686-01A1
+If you have any questions or problems, please contact to either joungmin AT vt.edu or ycheung5 AT vt.edu
