@@ -54,176 +54,39 @@ CancerSubtyper is a multi-service application consisting of:
 
 ---
 
-## Installing Docker and Docker Compose
+## Installation & Setup
 
-**⚠️ Important:** You must install Docker and Docker Compose before proceeding with the application setup.
+### 1. Install Docker and Docker Compose
+**⚠️ Important:** You must install **Docker** and **Docker Compose** before proceeding to the next step. We have prepared a dedicated installation guide to help you complete the setup easily for your operating system:
 
-### Step 1: Install Docker
+➡️ https://github.com/ycheung5/cancersubtyper/blob/main/INSTALL_DOCKER.md
 
-Choose the instructions that match your operating system:
-
-#### **For Windows:**
-
-1. **Install WSL2 (Windows Subsystem for Linux):**
-   - Open PowerShell as Administrator (right-click Start menu → Windows PowerShell (Admin))
-   - Copy and paste this command, then press Enter:
-     ```powershell
-     wsl --install
-     ```
-   - Restart your computer when prompted
-
-2. **After restart, install Docker Desktop:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click "Download for Windows"
-   - Open the downloaded file and follow the installation wizard
-   - Check the box for "Use WSL 2 instead of Hyper-V" during installation
-
-3. **Verify installation:**
-   - Open a WSL terminal or PowerShell
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number
-
-#### **For macOS:**
-
-1. **Download Docker Desktop for Mac:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click the big blue button that says "Download for Mac"
-   - Choose the version for your Mac chip:
-     - If you have an Apple Silicon Mac (M1, M2, M3), choose "Mac with Apple chip"
-     - If you have an Intel Mac, choose "Mac with Intel chip"
-
-2. **Open the downloaded file** (it will be in your Downloads folder)
-
-3. **Drag the Docker icon** into your Applications folder
-
-4. **Open Docker Desktop** from your Applications folder
-
-5. **Follow the setup wizard:**
-   - Click "Open" when asked about security
-   - You may be asked to enter your Mac password to grant permissions
-   - Click "Finish" when setup completes
-
-6. **Verify installation:**
-   - Open a Terminal (press Command + Space, type "Terminal", press Enter)
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number like: `Docker version 24.0.0`
-     
-#### **For Linux (Ubuntu/Debian):**
-
-We recommend using the official Docker installation script, which is the easiest method:
-
-1. **Open a terminal** (if you're on Windows, use WSL2 or a Linux virtual machine)
-
-2. **Run the following command to download and install Docker:**
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   ```
-
-   Press its Enter/Return key on your keyboard. You should see the script download.
-
-3. **Run the installation script:**
-   ```bash
-   sudo sh get-docker.sh
-   ```
-
-   You'll be asked to enter your password. Type your password and press Enter. Note: The cursor won't move while typing passwords - this is normal for security.
-
-4. **Add your user to the docker group** (this allows you to run Docker without typing 'sudo' every time):
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-
-5. **Log out and log back in** for the group change to take effect. Or run this command to apply it immediately:
-   ```bash
-   newgrp docker
-   ```
-
-6. **Verify Docker is installed correctly:**
-   ```bash
-   docker --version
-   ```
-
-   You should see something like: `Docker version 24.0.0, build 371ceee`
-
-7. **Test Docker by running a simple container:**
-   ```bash
-   docker run hello-world
-   ```
-
-   If successful, you'll see a message saying "Hello from Docker!"
+Please follow the steps in our guide, finish the installation, and then return to this document to continue with the setup.
 
 
-### Step 2: Install Docker Compose
-
-Docker Compose is usually included with Docker Desktop for Mac and Windows. For Linux, you may need to install it separately.
-
-#### **For Linux (automatic install):**
-
-Run these commands one by one in your terminal:
-
-```bash
-# Download the latest Docker Compose release
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-# Make the file executable
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Create a symbolic link
-sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-```
-
-#### **Verify Docker Compose installation:**
-
-```bash
-docker-compose --version
-```
-
-You should see something like: `Docker Compose version v2.21.0`
-
-### Step 3: Start Docker (if needed)
-
-- **Linux:** Docker usually starts automatically. If you get an error saying "Cannot connect to Docker", run:
-  ```bash
-  sudo systemctl start docker
-  sudo systemctl enable docker  # This makes Docker start automatically on boot
-  ```
-
-- **macOS/Windows:** Make sure Docker Desktop is running (you should see a Docker whale icon in your menu bar or system tray)
-
-### Step 4: Verify Both Are Working
-
-Run these two commands in your terminal to make sure everything is ready:
-
-```bash
-docker --version
-docker-compose --version
-```
-
-Both commands should return version numbers. If you see any errors, refer to the troubleshooting section at the end of this README.
-
----
-
-## Installation & Setup for CancerSubtyper
-
-### 1. Clone the Repository
+### 2. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/cancersubtyper.git
 cd cancersubtyper
 ```
 
-### 2. Set Up Environment Variables
-
+### 3. Set Up Environment Variables
 You need to create configuration files (called `.env` files) for the application. These files contain important settings like passwords and database information.
 
+<!--
 **⚠️ Important for beginners:** 
 - A `.env` file is a plain text file that stores configuration settings
 - The `.env` filename starts with a dot, which may make it hidden on some systems
 - You'll create these files using a text editor (like Notepad on Windows, TextEdit on Mac, or nano/vim on Linux)
+-->
 
-#### Root `.env` (for PostgreSQL Database)
+#### 📌 You will create 3 `.env` files
+
+<details>
+<summary> <strong>Root `.env` (for PostgreSQL Database)</strong> </summary>
+
+&nbsp;
 
 **Step 1:** Navigate to the project root directory (you should already be there after cloning):
 
@@ -233,23 +96,29 @@ pwd  # This shows your current directory - should show the cancersubtyper folder
 
 **Step 2:** Create a new file called `.env` in the project root:
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+   
 ```bash
 nano .env
 ```
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
+</details>
 
-**On Windows (using Notepad):**
+
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+**Using Notepad**
 - Open Notepad
 - Click File → Save As
 - Navigate to your cancersubtyper folder
 - In the "File name" box, type: `.env`
 - In the "Save as type" dropdown, select "All Files (*.*)"
 - Click Save
+
+</details>
+
 
 **Step 3:** Add the following content to the `.env` file:
 
@@ -271,7 +140,14 @@ POSTGRES_DB=cancersubtyper
 - **nano:** Press `Ctrl+X`, then `Y`, then Enter
 - **Notepad:** Click File → Save (or press Ctrl+S)
 
-#### API `.env` (Backend Configuration)
+
+</details>
+
+
+<details>
+<summary> <strong>API `.env` (Backend Configuration)</strong> </summary>
+
+&nbsp;
 
 Now you need to create another `.env` file in the `api/` subdirectory (the folder that contains the backend code).
 
@@ -280,28 +156,7 @@ Now you need to create another `.env` file in the `api/` subdirectory (the folde
 ```bash
 cd api
 ```
-
-**Step 2:** Create a new `.env` file:
-
-**On Linux or Mac:**
-```bash
-nano .env
-```
-
-**On Windows (using WSL):**
-```bash
-nano .env
-```
-
-**On Windows (using Notepad):**
-- Open Notepad
-- Click File → Save As
-- Navigate to the `api` folder inside your cancersubtyper folder
-- In the "File name" box, type: `.env`
-- In the "Save as type" dropdown, select "All Files (*.*)"
-- Click Save
-
-**Step 3:** Generate a JWT Secret Key first. This is a long random string used for security.
+**Step 2:** Generate a JWT Secret Key first. This is a long random string used for security.
 
 **On Linux or Mac:**
 Open a NEW terminal window (keep the editor open). Run one of these commands:
@@ -327,6 +182,27 @@ python -c "import secrets; print(secrets.token_hex(64))"
 ```
 
 **Copy the entire output** (it will be a long string of letters and numbers like `a3f5b7c9...`). You'll paste this in the next step.
+
+**Step 3:** Create a new `.env` file:
+
+**On Linux or Mac:**
+```bash
+nano .env
+```
+
+**On Windows (using WSL):**
+```bash
+nano .env
+```
+
+**On Windows (using Notepad):**
+- Open Notepad
+- Click File → Save As
+- Navigate to the `api` folder inside your cancersubtyper folder
+- In the "File name" box, type: `.env`
+- In the "Save as type" dropdown, select "All Files (*.*)"
+- Click Save
+
 
 **Step 4:** Add this content to the `api/.env` file and customize:
 
@@ -395,8 +271,13 @@ SAMPLE_FILE=/app/data/global/sample
 ```bash
 cd ..
 ```
+</details>
 
-#### App `.env` (Frontend Configuration)
+<details>
+<summary> <strong>App `.env` (Frontend Configuration)</strong> </summary>
+
+&nbsp;
+
 
 Finally, you need to create one more `.env` file in the `app/` subdirectory (the folder that contains the frontend code).
 
@@ -452,6 +333,7 @@ VITE_POLL_RUNNING=60000
 ```bash
 cd ..
 ```
+</details>
 
 ---
 
