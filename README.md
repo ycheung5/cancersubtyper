@@ -566,7 +566,7 @@ If you need to deploy this to a production server, here are the basic steps:
 
 ### With GPU Support (Advanced)
 
-**⚠️ This is optional and only needed if you have an NVIDIA GPU.**
+**⚠️ GPU support is currently disabled by default in `compose.yml`**
 
 By default, the application runs without GPU support. If you have an NVIDIA GPU and want to use it for faster processing:
 
@@ -581,25 +581,23 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
    nvidia-smi  # Should show your GPU information
    ```
 
-3. **GPU support is already configured** in `compose.yml` for the Celery worker and Flower services.
+3. **Edit `compose.yml` to enable GPU support:**
+   ```bash
+   # Uncomment the deploy sections for celery_worker and flower services
+   # Lines 64-72 for celery_worker
+   # Lines 90-98 for flower
+   ```
 
 4. **Run the application:**
    ```bash
    docker compose up --build
    ```
 
-#### Disable GPU Support (for systems without NVIDIA GPU):
+#### Current GPU Configuration:
 
-If you don't have an NVIDIA GPU, you can disable GPU support to avoid errors:
-
-1. **Edit `compose.yml`:**
-   - Comment out the `deploy` sections for `celery_worker` and `flower` services (lines 64-72 and 90-98)
-   - Or remove the GPU device reservations entirely
-
-2. **Run the application:**
-   ```bash
-   docker compose up --build
-   ```
+- **celery_worker**: GPU support is commented out (lines 64-72)
+- **flower**: GPU support is commented out (lines 90-98)
+- **To enable:** Uncomment the `deploy` sections in `compose.yml`
 
 **Note:** The application will work fine without GPU support, but model training and inference will be slower.
 
