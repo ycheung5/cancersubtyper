@@ -23,13 +23,15 @@ const ExampleFigure4 = () => {
             {/* Section Header */}
             <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                 <FaTable className="text-primary" />
-                Subtyping Results
+                Cancer subtyping results
             </h4>
 
             {/* Description */}
             <p className="text-sm text-gray-600 mb-3">
-                This table displays the classification results for the given job.
-                Each entry represents a prediction based on the selected model.
+            This table provides subtype prediction comparison between CancerSubminer and its baseline methods: K-means clustering and NEMO [1].
+            </p>
+            <p className="text-xs text-gray-500 mb-3">
+            [1] Rappoport, Nimrod, and Ron Shamir. "NEMO: cancer subtyping by integration of partial multi-omic data." Bioinformatics 35.18 (2019): 3348-3356.
             </p>
 
             {/* Loading Indicator */}

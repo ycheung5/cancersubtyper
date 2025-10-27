@@ -61,7 +61,7 @@ const SampleDetail = ({ projectId, target, source }) => {
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-base-content flex items-center gap-2">
                     <AiOutlineFileText className="text-primary" />
-                    Sample Files
+                    Dataset
                 </h2>
                 <button
                     className="btn btn-outline btn-primary flex items-center cursor-pointer"
@@ -78,7 +78,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                         <p className="text-lg font-medium">
-                            <strong>Source File:</strong>
+                            <strong>Labeled Data (Source):</strong>
                         </p>
                         <button
                             className="btn btn-sm btn-outline btn-info flex items-center"
@@ -104,7 +104,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                         <p className="text-lg font-medium">
-                            <strong>Target File:</strong>
+                            <strong>Unlabeled Data (Target):</strong>
                         </p>
                         <button
                             className="btn btn-sm btn-outline btn-info flex items-center"

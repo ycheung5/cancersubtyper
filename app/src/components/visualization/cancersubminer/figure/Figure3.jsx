@@ -54,12 +54,11 @@ const Figure3 = ({ id }) => {
         <div className="bg-base-200 p-5 rounded-lg shadow-md border border-base-300 mt-5">
             <h3 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaProjectDiagram className="text-primary" />
-                UMAP Visualizations
+                UMAP visualization of the datasets
             </h3>
 
             <p className="text-sm text-gray-500">
-                Each point represents a sample, with <strong>color</strong> indicating <strong>subtype</strong> and <strong>shape</strong> indicating <strong>batch</strong>.
-                The corrected datasets reflect the removal of batch effects, enabling clearer subtype patterns.
+            This analysis compared the uncorrected dataset with the features extracted from CancerSubminer, colored by the identified cancer subtypes and shaped by the batch. We also visualizes UMAP plots based on the subtyping results from K-means clustering and NEMO.
             </p>
 
             {loading ? (

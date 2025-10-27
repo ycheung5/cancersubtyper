@@ -23,13 +23,12 @@ const ExampleFigure4 = () => {
             {/* Section Header */}
             <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                 <FaTable className="text-primary" />
-                Classification Results
+                Cancer subtype prediction results
             </h4>
 
             {/* Description */}
             <p className="text-sm text-gray-600 mb-3">
-                This table presents the classification results, alongside predictions from baseline machine learning and deep learning models.
-                It allows for direct comparison across methods to evaluate model performance.
+            This table provides subtype prediction comparison between BCtypeFinder and baseline machine learning models: Support vector machine (SVM), Random Forest, and Logistic regression. The machine learning models were implemented using Scikit-learn package with default parameters.
             </p>
 
             {/* Loading Indicator */}

@@ -70,7 +70,7 @@ const ExampleFigure1 = () => {
             {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Analysis
+                Exploration of Methylation Patterns in Identified Subtype
             </h3>
             <p className="text-sm text-gray-500 mb-6">
                 This section provides visualizations and tables for exploring CpG clusters across different batches and subtypes.
@@ -173,7 +173,7 @@ const ExampleFigure1 = () => {
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaTable className="text-primary" />
-                        Details for CpG clusters extracted from the model
+                        CpG cluster annotation table showing cluster ID, CpG identifier, chromosomal location, strand, and gene annotation
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
                         This table lists detailed attributes of the top 30 CpG clusters included in the correlation heatmap above.

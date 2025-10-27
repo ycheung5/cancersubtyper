@@ -80,7 +80,7 @@ const ProjectDetail = ({ project }) => {
                 <div className="p-5 bg-base-200 rounded-lg shadow-md">
                     <h2 className="text-xl font-semibold text-base-content mb-3">Project Information</h2>
                     <p className="text-lg font-medium flex items-center gap-2 pb-2">
-                        <strong>Tumor Type:</strong>
+                        <strong>Cancer Type:</strong>
                         {project.tumor_type ? (
                             <span className="badge badge-accent text-base-content">
                                 {project.tumor_type}

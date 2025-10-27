@@ -108,7 +108,7 @@ const DemoProject = () => {
                                 <div className="p-5 bg-base-200 rounded-lg shadow-md">
                                     <h2 className="text-xl font-semibold text-base-content mb-3">Project Information</h2>
                                     <p className="text-lg font-medium flex items-center gap-2 pb-2">
-                                        <strong>Tumor Type:</strong>
+                                        <strong>Cancer Type:</strong>
                                         <span className="badge badge-accent text-base-content">
                                             Breast Cancer
                                         </span>
@@ -172,7 +172,7 @@ const DemoProject = () => {
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-semibold text-base-content flex items-center gap-2">
                                     <AiOutlineFileText className="text-primary" />
-                                    Sample Files
+                                    Dataset
                                 </h2>
                                 <button
                                     className="btn btn-outline btn-primary flex items-center cursor-pointer btn-disabled"
@@ -186,7 +186,7 @@ const DemoProject = () => {
                                 {/* Source File */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                                     <p className="text-lg font-medium">
-                                        <strong>Source File:</strong>
+                                        <strong>Labeled Data (Source):</strong>
                                     </p>
                                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                                         <div className="flex items-center gap-2 text-blue-600">
@@ -199,7 +199,7 @@ const DemoProject = () => {
                                 {/* Target File */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                                     <p className="text-lg font-medium">
-                                        <strong>Target File:</strong>
+                                        <strong>Unlabeled Data (Target):</strong>
                                     </p>
                                     <div className="mt-2 p-2 bg-base-200 rounded-md border border-base-300 max-h-16 overflow-y-auto break-words">
                                         <div className="flex items-center gap-2 text-blue-600">
@@ -215,10 +215,10 @@ const DemoProject = () => {
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-semibold text-base-content flex items-center gap-2">
                                     <FaFileDownload className="text-primary" />
-                                    Download Example Datasets
+                                    Download Example Dataset
                                 </h2>
                                 <div className="text-sm text-base-content/70">
-                                    Get sample data to try the platform
+                                    Get dataset to try the platform
                                 </div>
                             </div>
 
@@ -226,11 +226,11 @@ const DemoProject = () => {
                                 {/* Source Dataset */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                                     <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-medium text-base-content">Source Dataset</h3>
+                                        <h3 className="text-lg font-medium text-base-content">Labeled Data (Source)</h3>
                                         <FaFileCsv className="text-blue-600 text-xl" />
                                     </div>
                                     <p className="text-sm text-base-content/70 mb-3">
-                                        Labeled training data with known subtypes
+                                        Labeled data with known subtypes
                                     </p>
                                     <button
                                         className="btn btn-sm btn-outline btn-primary w-full flex items-center justify-center"
@@ -245,7 +245,7 @@ const DemoProject = () => {
                                 {/* Target Dataset */}
                                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                                     <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-lg font-medium text-base-content">Target Dataset</h3>
+                                        <h3 className="text-lg font-medium text-base-content">Unlabeled Data (Target)</h3>
                                         <FaFileCsv className="text-green-600 text-xl" />
                                     </div>
                                     <p className="text-sm text-base-content/70 mb-3">

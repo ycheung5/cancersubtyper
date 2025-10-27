@@ -66,7 +66,7 @@ const DemoDashboard = () => {
                         <thead className="bg-base-200">
                         <tr>
                             <th className="px-6 py-3 text-left text-base-content w-[20%]">Project Name</th>
-                            <th className="px-6 py-3 text-left text-base-content w-[25%]">Tumor Type</th>
+                            <th className="px-6 py-3 text-left text-base-content w-[25%]">Cancer Type</th>
                             <th className="px-6 py-3 text-left text-base-content w-[25%]">Description</th>
                             <th className="px-6 py-3 text-left text-base-content w-[15%]">Status</th>
                             <th className="px-6 py-3 text-left text-base-content w-[15%]">Last Edited</th>
@@ -80,7 +80,7 @@ const DemoDashboard = () => {
                                     <span className="block truncate">Breast Cancer Subtyping (DEMO)</span>
                                 </td>
 
-                                {/* Tumor Type */}
+                                {/* Cancer Type */}
                                 <td className="px-6 py-3 text-base-content relative max-w-[200px] truncate">
                                     <span className="block truncate">Breast Cancer</span>
                                 </td>

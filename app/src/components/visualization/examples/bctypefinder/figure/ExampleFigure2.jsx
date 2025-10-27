@@ -49,7 +49,7 @@ const ExampleFigure2 = () => {
             {/* Section Title */}
             <h3 className="text-xl font-semibold text-base-content flex items-center gap-2 mb-4">
                 <FaChartBar className="text-primary" />
-                CpG Cluster Beta Value Distribution
+                Investigating Methylation Variation across Subtypes
             </h3>
             <p className="text-sm text-gray-500 mb-6">
                 This section allows you to explore the distribution of beta values for specific CpG clusters across batches.
@@ -119,10 +119,10 @@ const ExampleFigure2 = () => {
                 <div className="bg-base-100 p-6 rounded-lg shadow-md border border-base-300 mt-6">
                     <h4 className="text-lg font-semibold text-base-content flex items-center gap-2 mb-3">
                         <FaChartBar className="text-primary" />
-                        Distribution Boxplot
+                        Visualization of beta value distribution for a user-selected CpG cluster across cancer subtypes
                     </h4>
                     <p className="text-sm text-gray-500 mb-6">
-                        This boxplot displays the distribution of beta values for the selected CpG cluster, grouped by batch.
+                        This boxplot displays the distribution of beta values for the selected CpG cluster, grouped by subtype, enabling exploration of subtype-specific methylation patterns.
                     </p>
 
                     <div className="flex justify-end gap-4 mt-4">
