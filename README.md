@@ -898,9 +898,3 @@ Default storage limit: **20GB per user** (configurable via `MAX_STORAGE_BYTES`)
 This work was supported by:
 - U.S. National Science Foundation (NSF) Awards #2004751, #2125798, #2344169, and #2319522
 - National Institutes of Health (NIH) Grant #1R01AI179686-01A1
-
----
-
-## Contact
-
-For questions, issues, or contributions, please [open an issue](https://github.com/your-username/cancersubtyper/issues) on GitHub.
