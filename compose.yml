@@ -61,13 +61,15 @@ services:
       - redis
       - db
       - api
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # GPU support - requires NVIDIA Container Toolkit installed
+    # If you don't have GPU support, comment out the deploy section below
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
 
   flower:
     container_name: flower
@@ -85,13 +87,15 @@ services:
     depends_on:
       - redis
       - celery_worker
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # GPU support - requires NVIDIA Container Toolkit installed
+    # If you don't have GPU support, comment out the deploy section below
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
 
   # nginx:
   #   image: nginx:alpine
