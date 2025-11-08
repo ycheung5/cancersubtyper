@@ -57,6 +57,15 @@ const Hero = () => {
                             Try Demo
                         </button>
 
+                        <a
+                            href="https://www.youtube.com/watch?v=xw05Zq01-EQ"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-info btn-lg px-6 transition duration-300 transform hover:scale-105"
+                        >
+                            Tutorial
+                        </a>
+
                         <button
                             onClick={() => {
                                 document.getElementById("model-structure")?.scrollIntoView({ behavior: "smooth" });
