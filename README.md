@@ -1,14 +1,11 @@
-# CancerSubtyper
+# CancerSubtyper: A Deep Learning Framework for Cancer Subtyping Through DNA Methylation Data
 
-## Abstract
 
-**CancerSubtyper** is a web-based platform for deep learning-based cancer subtyping using DNA methylation data. It supports both supervised and semi-supervised workflows for predicting or discovering molecular subtypes. Users can upload methylation datasets (with or without subtype labels), run models, and explore interactive visualizations such as UMAP projections, CpG heatmaps, and Kaplan-Meier survival plots.
+**CancerSubtyper** is an end-to-end computational framework for deep learning–based cancer subtyping using DNA methylation data, which is accessible through an intuitive web interface designed to support interactive exploration and downstream analysis. It supports two complementary models—a semi-supervised classifier for cancers with well-defined subtypes, and a hybrid framework that enables the discovery of novel subtypes. CancerSubtyper provides automated data processing, feature selection, batch effect correction, and cancer subtyping along with extensive interactive visualizations for biological interpretation and clinical relevance assessment.
 
 The platform currently includes:
-- **BCtypeFinder** – a supervised classifier trained on TCGA-BRCA for intrinsic breast cancer subtype prediction.
-- **CancerSubminer** – a semi-supervised model that performs subtype discovery or refinement with optional clustering constraints.
-
-This tool is designed to be accessible to non-programmers while remaining robust enough for advanced molecular analysis.
+- **[BCtypeFinder](https://www.liebertpub.com/doi/abs/10.1177/15578666251380233?casa_token=FrsS1pL4s9EAAAAA%3ALj5R2mvC-Fvwf6j1QgLUi7qvyXVJ65__j5N-VfGLV9uNG3bmpppJMNV-xpmgqKSOuVJIk5Svw50)** – a semi-supervised classification approach optimized for cancers with well-established subtypes.
+- **[CancerSubminer](https://www.biorxiv.org/content/10.1101/2025.10.17.682936v1)** – an integrative framework that combines supervised and unsupervised learning to facilitate the discovery of novel subgroups in less-characterized cancers.
 
 ---
 
@@ -16,13 +13,12 @@ This tool is designed to be accessible to non-programmers while remaining robust
 
 - [Requirements](#requirements)
 - [Architecture](#architecture)
-- [Installing Docker and Docker Compose](#installing-docker-and-docker-compose)
 - [Installation & Setup](#installation--setup)
 - [Running the Application](#running-the-application)
-- [Accessing Services](#accessing-services)
+- [DEMO dataset](#demo-dataset)
 - [Development](#development)
 - [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [Contact](#contact)
 
 ---
 
@@ -30,18 +26,16 @@ This tool is designed to be accessible to non-programmers while remaining robust
 
 ### Software Dependencies
 
-Before you begin, you need to install the following software on your computer:
-
 - **Docker** (version 20.10 or higher) - A platform that allows you to run applications in containers
 - **Docker Compose** (version 2.0 or higher) - A tool for defining and running multi-container Docker applications
-- **NVIDIA Docker Runtime** (for GPU support - optional but recommended) - Only needed if you have an NVIDIA GPU
+- **NVIDIA Docker Runtime** (*optional*) - Only needed if you have an NVIDIA GPU (for GPU support)
 
 ### Hardware Recommendations
 
 - **CPU**: 4 or more cores
 - **RAM**: At least 16GB (32GB is recommended for best performance)
 - **Disk**: At least 50GB of free storage space (more space for larger datasets)
-- **GPU**: NVIDIA GPU with CUDA support (optional, speeds up model training/inference)
+- **GPU** (*optional*): NVIDIA GPU with CUDA support (speeds up model training)
 
 ---
 
@@ -58,177 +52,41 @@ CancerSubtyper is a multi-service application consisting of:
 
 ---
 
-## Installing Docker and Docker Compose
-
-**⚠️ Important:** You must install Docker and Docker Compose before proceeding with the application setup.
-
-### Step 1: Install Docker
-
-Choose the instructions that match your operating system:
-
-#### **For Linux (Ubuntu/Debian):**
-
-We recommend using the official Docker installation script, which is the easiest method:
-
-1. **Open a terminal** (if you're on Windows, use WSL2 or a Linux virtual machine)
-
-2. **Run the following command to download and install Docker:**
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   ```
-
-   Press its Enter/Return key on your keyboard. You should see the script download.
-
-3. **Run the installation script:**
-   ```bash
-   sudo sh get-docker.sh
-   ```
-
-   You'll be asked to enter your password. Type your password and press Enter. Note: The cursor won't move while typing passwords - this is normal for security.
-
-4. **Add your user to the docker group** (this allows you to run Docker without typing 'sudo' every time):
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-
-5. **Log out and log back in** for the group change to take effect. Or run this command to apply it immediately:
-   ```bash
-   newgrp docker
-   ```
-
-6. **Verify Docker is installed correctly:**
-   ```bash
-   docker --version
-   ```
-
-   You should see something like: `Docker version 24.0.0, build 371ceee`
-
-7. **Test Docker by running a simple container:**
-   ```bash
-   docker run hello-world
-   ```
-
-   If successful, you'll see a message saying "Hello from Docker!"
-
-#### **For macOS:**
-
-1. **Download Docker Desktop for Mac:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click the big blue button that says "Download for Mac"
-   - Choose the version for your Mac chip:
-     - If you have an Apple Silicon Mac (M1, M2, M3), choose "Mac with Apple chip"
-     - If you have an Intel Mac, choose "Mac with Intel chip"
-
-2. **Open the downloaded file** (it will be in your Downloads folder)
-
-3. **Drag the Docker icon** into your Applications folder
-
-4. **Open Docker Desktop** from your Applications folder
-
-5. **Follow the setup wizard:**
-   - Click "Open" when asked about security
-   - You may be asked to enter your Mac password to grant permissions
-   - Click "Finish" when setup completes
-
-6. **Verify installation:**
-   - Open a Terminal (press Command + Space, type "Terminal", press Enter)
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number like: `Docker version 24.0.0`
-
-#### **For Windows:**
-
-1. **Install WSL2 (Windows Subsystem for Linux):**
-   - Open PowerShell as Administrator (right-click Start menu → Windows PowerShell (Admin))
-   - Copy and paste this command, then press Enter:
-     ```powershell
-     wsl --install
-     ```
-   - Restart your computer when prompted
-
-2. **After restart, install Docker Desktop:**
-   - Go to: https://www.docker.com/products/docker-desktop/
-   - Click "Download for Windows"
-   - Open the downloaded file and follow the installation wizard
-   - Check the box for "Use WSL 2 instead of Hyper-V" during installation
-
-3. **Verify installation:**
-   - Open a WSL terminal or PowerShell
-   - Type: `docker --version`
-   - Press Enter
-   - You should see a version number
-
-### Step 2: Install Docker Compose
-
-Docker Compose is usually included with Docker Desktop for Mac and Windows. For Linux, you may need to install it separately.
-
-#### **For Linux (automatic install):**
-
-Run these commands one by one in your terminal:
-
-```bash
-# Download the latest Docker Compose release
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-# Make the file executable
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Create a symbolic link
-sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-```
-
-#### **Verify Docker Compose installation:**
-
-```bash
-docker-compose --version
-```
-
-You should see something like: `Docker Compose version v2.21.0`
-
-### Step 3: Start Docker (if needed)
-
-- **Linux:** Docker usually starts automatically. If you get an error saying "Cannot connect to Docker", run:
-  ```bash
-  sudo systemctl start docker
-  sudo systemctl enable docker  # This makes Docker start automatically on boot
-  ```
-
-- **macOS/Windows:** Make sure Docker Desktop is running (you should see a Docker whale icon in your menu bar or system tray)
-
-### Step 4: Verify Both Are Working
-
-Run these two commands in your terminal to make sure everything is ready:
-
-```bash
-docker --version
-docker-compose --version
-```
-
-Both commands should return version numbers. If you see any errors, refer to the troubleshooting section at the end of this README.
-
----
-
 ## Installation & Setup
 
-### 1. Clone the Repository
+### 1. Install Docker and Docker Compose
+**⚠️ Important:** You must install **Docker** and **Docker Compose** before proceeding to the next step. We have prepared a dedicated installation guide to help you complete the setup easily for your operating system:
+
+➡️ https://github.com/ycheung5/cancersubtyper/blob/main/INSTALL_DOCKER.md
+
+Please follow the steps in our guide, finish the installation, and then return to this document to continue with the setup.
+
+
+### 2. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/cancersubtyper.git
 cd cancersubtyper
 ```
 
-### 2. Set Up Environment Variables
-
+### 3. Set Up Environment Variables
 You need to create configuration files (called `.env` files) for the application. These files contain important settings like passwords and database information.
 
+<!--
 **⚠️ Important for beginners:** 
 - A `.env` file is a plain text file that stores configuration settings
 - The `.env` filename starts with a dot, which may make it hidden on some systems
 - You'll create these files using a text editor (like Notepad on Windows, TextEdit on Mac, or nano/vim on Linux)
+-->
 
-#### Root `.env` (for PostgreSQL Database)
+#### 📌 You will create 3 `.env` files
 
-**Step 1:** Navigate to the project root directory (you should already be there after cloning):
+<details>
+<summary> <strong>Root `.env` (for PostgreSQL Database)</strong> </summary>
+
+&nbsp;
+
+**Step 1:** Navigate to the project root directory:
 
 ```bash
 pwd  # This shows your current directory - should show the cancersubtyper folder
@@ -236,23 +94,29 @@ pwd  # This shows your current directory - should show the cancersubtyper folder
 
 **Step 2:** Create a new file called `.env` in the project root:
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+   
 ```bash
 nano .env
 ```
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
+</details>
 
-**On Windows (using Notepad):**
+
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+**Using Notepad**
 - Open Notepad
 - Click File → Save As
 - Navigate to your cancersubtyper folder
 - In the "File name" box, type: `.env`
 - In the "Save as type" dropdown, select "All Files (*.*)"
 - Click Save
+
+</details>
+
 
 **Step 3:** Add the following content to the `.env` file:
 
@@ -274,7 +138,14 @@ POSTGRES_DB=cancersubtyper
 - **nano:** Press `Ctrl+X`, then `Y`, then Enter
 - **Notepad:** Click File → Save (or press Ctrl+S)
 
-#### API `.env` (Backend Configuration)
+
+</details>
+
+
+<details>
+<summary> <strong>API `.env` (Backend Configuration)</strong> </summary>
+
+&nbsp;
 
 Now you need to create another `.env` file in the `api/` subdirectory (the folder that contains the backend code).
 
@@ -283,30 +154,13 @@ Now you need to create another `.env` file in the `api/` subdirectory (the folde
 ```bash
 cd api
 ```
+**Step 2:** Generate a JWT Secret Key first. This is a long random string used for security.
 
-**Step 2:** Create a new `.env` file:
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
 
-**On Linux or Mac:**
-```bash
-nano .env
-```
+&nbsp;
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
-
-**On Windows (using Notepad):**
-- Open Notepad
-- Click File → Save As
-- Navigate to the `api` folder inside your cancersubtyper folder
-- In the "File name" box, type: `.env`
-- In the "Save as type" dropdown, select "All Files (*.*)"
-- Click Save
-
-**Step 3:** Generate a JWT Secret Key first. This is a long random string used for security.
-
-**On Linux or Mac:**
 Open a NEW terminal window (keep the editor open). Run one of these commands:
 
 ```bash
@@ -317,19 +171,49 @@ python3 -c "import secrets; print(secrets.token_hex(64))"
 openssl rand -hex 64
 ```
 
-**On Windows (WSL):**
+</details>
+
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
 Open a NEW terminal window and run:
 
 ```bash
 python3 -c "import secrets; print(secrets.token_hex(64))"
 ```
 
-**On Windows (PowerShell):**
-```powershell
-python -c "import secrets; print(secrets.token_hex(64))"
-```
+</details>
 
 **Copy the entire output** (it will be a long string of letters and numbers like `a3f5b7c9...`). You'll paste this in the next step.
+
+**Step 3:** Create a new `.env` file:
+
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+
+&nbsp;
+
+```bash
+nano .env
+```
+
+</details>
+
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
+- Open Notepad
+- Click File → Save As
+- Navigate to the `api` folder inside your cancersubtyper folder
+- In the "File name" box, type: `.env`
+- In the "Save as type" dropdown, select "All Files (*.*)"
+- Click Save
+
+</details>
 
 **Step 4:** Add this content to the `api/.env` file and customize:
 
@@ -398,8 +282,13 @@ SAMPLE_FILE=/app/data/global/sample
 ```bash
 cd ..
 ```
+</details>
 
-#### App `.env` (Frontend Configuration)
+<details>
+<summary> <strong>App `.env` (Frontend Configuration)</strong> </summary>
+
+&nbsp;
+
 
 Finally, you need to create one more `.env` file in the `app/` subdirectory (the folder that contains the frontend code).
 
@@ -411,23 +300,30 @@ cd app
 
 **Step 2:** Create a new `.env` file:
 
-**On Linux or Mac:**
+<details>
+<summary> <strong>Linux or Mac Instructions</strong> </summary>
+
+&nbsp;
+
 ```bash
 nano .env
 ```
 
-**On Windows (using WSL):**
-```bash
-nano .env
-```
+</details>
 
-**On Windows (using Notepad):**
+<details>
+<summary> <strong>Windows Instructions</strong> </summary>
+
+&nbsp;
+
 - Open Notepad
 - Click File → Save As
-- Navigate to the `app` folder inside your cancersubtyper folder
+- Navigate to the `api` folder inside your cancersubtyper folder
 - In the "File name" box, type: `.env`
 - In the "Save as type" dropdown, select "All Files (*.*)"
 - Click Save
+
+</details>
 
 **Step 3:** Add the following content to the `app/.env` file:
 
@@ -441,20 +337,14 @@ VITE_POLL_PREPROCESSING=60000
 VITE_POLL_RUNNING=60000
 ```
 
-**⚠️ Important:** 
-- For development on your local computer, use `http://localhost:8000` as shown above
-- For production deployment, change `VITE_API_BASE_URL` to your actual API domain (e.g., `https://api.yourdomain.com`)
-- You can leave the polling intervals as they are unless you have specific requirements
-
-**Step 4:** Save and close the file:
-- **nano:** Press `Ctrl+X`, then `Y`, then Enter
-- **Notepad:** Click File → Save (or press Ctrl+S)
+**Step 4:** Save and close the file.
 
 **Step 5:** Go back to the project root directory (this is important for the next step):
 
 ```bash
 cd ..
 ```
+</details>
 
 ---
 
@@ -503,8 +393,6 @@ This should show something ending with `cancersubtyper`. If not, navigate there:
 cd path/to/your/cancersubtyper
 ```
 
-### Development Mode (with hot reload)
-
 **Step 1:** Run the application with this command:
 
 ```bash
@@ -516,7 +404,9 @@ docker compose up --build
 - `up` - starts the containers
 - `--build` - rebuilds the images to include any code changes
 
-**Step 2:** You'll see lots of output scrolling in your terminal. This is normal! Docker is:
+**Step 2:** You'll see lots of output scrolling in your terminal. This is normal! 
+<!--
+Docker is:
 1. Building all Docker images (this downloads necessary software like Python, Node.js, databases, etc.)
 2. Starting PostgreSQL database
 3. Starting Redis (message queue)
@@ -524,7 +414,7 @@ docker compose up --build
 5. Starting Frontend web server
 6. Starting Celery workers (for background tasks)
 7. Enabling hot-reload (🧾 automatic updates when you change code)
-
+-->
 **⚠️ First-time setup:** This step will take several minutes the first time (5-15 minutes) because Docker needs to download all the required software. Subsequent startups will be much faster (30-60 seconds).
 
 **Step 3:** You'll know everything is ready when you see messages like:
@@ -532,7 +422,12 @@ docker compose up --build
 - "Started server process"
 - "Frontend development server running"
 
-You can now access the application at http://localhost:5173
+You can now access the application at **http://localhost:5173**. If you successfully installed, you will see the below main page:
+
+&nbsp;
+
+<img width="1297" height="927" alt="image" src="https://github.com/user-attachments/assets/5eee8f4a-703f-40fd-881b-847a7003f943" />
+
 
 **Tip:** Keep this terminal window open. If you close it, the application will stop running.
 
@@ -540,31 +435,15 @@ You can now access the application at http://localhost:5173
 - Press `Ctrl+C` in the terminal
 - Or in a new terminal window, run: `docker compose down`
 
-### Production Mode
+**To restart the application:**
+```bash
+docker compose up
+```
 
-**⚠️ Production Mode is for deploying the application to a server, not for local development.**
+<details>
+<summary> <strong>With GPU Support (Advanced)</strong> </summary>
 
-If you're just getting started and testing the application on your own computer, you don't need this section. Continue with the next section "Accessing Services" instead.
-
-If you need to deploy this to a production server, here are the basic steps:
-
-1. **Build optimized frontend:**
-   ```bash
-   cd app
-   npm run build
-   cd ..
-   ```
-
-2. **Configure nginx service** in `compose.yml` (currently commented out)
-
-3. **Run in detached mode** (runs in background):
-   ```bash
-   docker compose up -d
-   ```
-
-**Note:** Production deployment is an advanced topic. If you're a beginner, we recommend sticking with Development Mode for now.
-
-### With GPU Support (Advanced)
+&nbsp;
 
 **⚠️ GPU support is currently disabled by default in `compose.yml`**
 
@@ -599,8 +478,12 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
 - **flower**: GPU support is commented out (lines 90-98)
 - **To enable:** Uncomment the `deploy` sections in `compose.yml`
 
-**Note:** The application will work fine without GPU support, but model training and inference will be slower.
+</details>
 
+**Note:** Cancersubtyper can be run without GPU support.
+
+
+<!--
 ---
 
 ## Accessing Services
@@ -614,6 +497,7 @@ Once the application is running, you can access different parts of the system:
 - **Description:** This is the main user interface where you'll upload data, run jobs, and view results
 - **How to access:** Open your web browser and go to `http://localhost:5173`
 - **First time:** You'll need to create an account or sign in
+
 
 ### 🔧 Developer Tools (Optional)
 
@@ -645,6 +529,8 @@ These are mainly for developers, but you can explore them if curious:
 - **Tools needed:** Install a database client like pgAdmin or DBeaver
 - **For beginners:** You don't need to access this directly - the web interface handles everything
 
+-->
+
 ### Summary
 
 **To start using the application:**
@@ -653,16 +539,24 @@ These are mainly for developers, but you can explore them if curious:
 3. Go to http://localhost:5173
 4. Create an account and start uploading data!
 
-**Getting Demo Data and Templates:**
+---
+
+## DEMO Dataset
+Breast cancer DNA methylation dataset used in the prototype analysis in CancerSubtyper paper can be downloaded from [here](https://drive.google.com/drive/folders/1q-1ctysnpSjzl6r85oIaNr02NtABvcW0?usp=sharing).
+- Demo datasets are pre-compressed in `.gz` format and ready to upload
+
+**Getting Demo Data and Templates in CancerSubtyper:**
 - Use the **"Get Template"** buttons (available in both regular projects and demo projects) to download CSV templates for proper formatting:
   - **Metadata template**: Sample clinical data format (sample_id, os_time, status)
   - **Source template**: CpG methylation data format with subtype labels
   - **Target template**: CpG methylation data format with batch labels
+
+&nbsp;
 - Use the **"Download Demo Data"** buttons (available in both regular projects and demo projects) to get sample datasets directly from Google Drive:
-  - **Source data** (198.7 MB compressed): TCGA-BRCA methylation data with subtype labels
-  - **Target data** (101.9 MB compressed): Multiple breast cancer datasets for prediction
-  - **Metadata** (45 KB): Sample clinical annotations
-- Demo datasets are pre-compressed in `.gz` format and ready to upload
+  - **Source data** (198.7 MB compressed): TCGA-BRCA methylation data with subtype labels composed of 1,060 samples profiled using the Illumina Human Infinium 450K and 27K platforms
+  - **Target data** (101.9 MB compressed): Three publicly available breast cancer methylation datasets from GEO (GSE69914, GSE75067, GSE72245)
+  - **Metadata** (45 KB): Sample clinical information used for survival analysis
+
 
 ---
 
@@ -947,8 +841,6 @@ Default storage limit: **20GB per user** (configurable via `MAX_STORAGE_BYTES`)
 
 ---
 
-## Acknowledgments
+## Contact
 
-This work was supported by:
-- U.S. National Science Foundation (NSF) Awards #2004751, #2125798, #2344169, and #2319522
-- National Institutes of Health (NIH) Grant #1R01AI179686-01A1
+If you have any questions or problems, please contact to either joungmin AT vt.edu or ycheung5 AT vt.edu
