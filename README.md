@@ -483,13 +483,6 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
 
 **Note:** Cancersubtyper can be run without GPU support.
 
----
-
-## Tutorial
-
-> Click below to watch the tutorial on YouTube 👇
-[![CancerSubtyper Demo](https://img.youtube.com/vi/xw05Zq01-EQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=xw05Zq01-EQ)
-
 <!--
 ---
 
@@ -545,6 +538,13 @@ These are mainly for developers, but you can explore them if curious:
 2. Open your web browser
 3. Go to http://localhost:5173
 4. Create an account and start uploading data!
+
+---
+
+## Tutorial
+
+> Click below to watch the tutorial on YouTube 👇
+[![CancerSubtyper Demo](https://img.youtube.com/vi/xw05Zq01-EQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=xw05Zq01-EQ)
 
 ---
 
