@@ -15,6 +15,7 @@ The platform currently includes:
 - [Architecture](#architecture)
 - [Installation & Setup](#installation--setup)
 - [Running the Application](#running-the-application)
+- [Tutorial](#tutorial)
 - [DEMO dataset](#demo-dataset)
 - [Development](#development)
 - [Troubleshooting](#troubleshooting)
@@ -482,6 +483,12 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
 
 **Note:** Cancersubtyper can be run without GPU support.
 
+---
+
+## Tutorial
+
+> Click below to watch the tutorial on YouTube 👇
+[![CancerSubtyper Demo](https://img.youtube.com/vi/xw05Zq01-EQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=xw05Zq01-EQ)
 
 <!--
 ---
