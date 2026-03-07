@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from fastapi import HTTPException
 from celery.result import AsyncResult
+from kombu.exceptions import KombuError
 
 from models import Job, JobStatusEnum, Model
 from repository.base_repository import BaseRepository
@@ -13,6 +14,23 @@ from tasks.model_parameters import normalize_model_parameters
 
 
 class JobRepository(BaseRepository):
+    @staticmethod
+    def _ensure_job_service_available():
+        try:
+            inspector = celery.control.inspect(timeout=1.0)
+            active_workers = inspector.ping() if inspector else None
+        except (KombuError, OSError) as exc:
+            raise HTTPException(
+                status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+                detail="The job service is currently unavailable. Please make sure the Celery worker and Redis services are running.",
+            ) from exc
+
+        if not active_workers:
+            raise HTTPException(
+                status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+                detail="The job service is currently unavailable. Please make sure the Celery worker is running before creating a job.",
+            )
+
     def create_job(self, job_data: JobCreate, project_repo: ProjectRepository):
         """Creates a new job, validates project existence, and queues the task for Celery."""
 
@@ -42,7 +60,10 @@ class JobRepository(BaseRepository):
                 detail="Source file missing in Project. Upload a source file or use the pretrained model.",
             )
 
-        # Step 4: Create a New Job
+        # Step 4: Ensure the async job service is reachable before creating a job record
+        self._ensure_job_service_available()
+
+        # Step 5: Create a New Job
         new_job = Job(
             project_id=job_data.project_id,
             model_id=job_data.model_id,
@@ -54,8 +75,16 @@ class JobRepository(BaseRepository):
         self.db.commit()
         self.db.refresh(new_job)
 
-        # Step 5: Send Job to Celery Worker
-        run_model.delay(new_job.id, job_data.model_parameters)
+        # Step 6: Send Job to Celery Worker
+        try:
+            run_model.apply_async(args=[new_job.id, job_data.model_parameters], task_id=str(new_job.id))
+        except (KombuError, OSError) as exc:
+            self.db.delete(new_job)
+            self.db.commit()
+            raise HTTPException(
+                status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+                detail="The job service is currently unavailable. Please try again after the Celery worker is back online.",
+            ) from exc
 
         return new_job
 

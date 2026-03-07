@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hideToast } from "../redux/toastSlice";
-import { XCircleIcon, CheckCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { XCircleIcon, CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const Toast = () => {
     const dispatch = useDispatch();
     const { message, type, visible } = useSelector((state) => state.toast);
     const [timeoutId, setTimeoutId] = useState(null);
-    const messageRef = useRef(null);
 
     useEffect(() => {
         if (visible) {
@@ -46,22 +45,15 @@ const Toast = () => {
             <div
                 className={`alert shadow-lg ${
                     type === "success" ? "alert-success" : "alert-error"
-                } flex items-center justify-between px-4 py-3 rounded-lg`}
-                style={{
-                    minWidth: "200px",
-                    maxWidth: "500px",
-                    width: messageRef.current
-                        ? `${messageRef.current.offsetWidth + 80}px`
-                        : "auto",
-                }}
+                } w-[calc(100vw-2rem)] max-w-xl items-start px-4 py-3 rounded-lg`}
             >
                 <div className="flex items-center gap-3">
                     {type === "success" ? (
-                        <CheckCircleIcon className="w-6 h-6 text-white" />
+                        <CheckCircleIcon className="mt-0.5 h-6 w-6 shrink-0 text-white" />
                     ) : (
-                        <XCircleIcon className="w-6 h-6 text-white" />
+                        <XCircleIcon className="mt-0.5 h-6 w-6 shrink-0 text-white" />
                     )}
-                    <span ref={messageRef} className="text-white whitespace-nowrap">
+                    <span className="break-words pr-2 text-white">
                         {message}
                     </span>
                 </div>

@@ -15,6 +15,7 @@ import Visualization from "./pages/Visualization.jsx";
 import ExampleVisualization from "./pages/demo/ExampleVisualization.jsx";
 import DemoDashboard from "./pages/demo/DemoDashboard.jsx";
 import DemoProject from "./pages/demo/DemoProject.jsx";
+import BackendHealthBanner from "./components/BackendHealthBanner.jsx";
 
 const App = () => {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const App = () => {
     return (
         <BrowserRouter>
             <Navbar />
+            <BackendHealthBanner />
             <Toast />
             <Routes>
                 <Route path={RouteConstants.home} element={<Home />} />
@@ -68,4 +70,3 @@ const App = () => {
 };
 
 export default App;
-

@@ -1,6 +1,7 @@
 import os
 import zipfile
 from pathlib import Path
+import sys
 
 import pandas as pd
 from sklearn.impute import SimpleImputer
@@ -19,6 +20,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from scipy.special import softmax # ADD
 
+API_DIR = Path(__file__).resolve().parents[3]
+if str(API_DIR) not in sys.path:
+    sys.path.insert(0, str(API_DIR))
+
 from config import settings
 from tasks.model_parameters import normalize_model_parameters
 from util.path_untils import source_sample_file_path, target_sample_file_path, job_preprocessing_path, job_result_path, \
@@ -29,6 +34,30 @@ SAMPLE_DIR = Path(settings.sample_file)
 if not SAMPLE_DIR.is_dir():
     SAMPLE_DIR = SAMPLE_DIR.parent
 MODEL_SAMPLE_DIR = SAMPLE_DIR / "bctypefinder"
+
+
+def _build_pretrained_subtype_info(sample_ids, numeric_labels):
+    reference_path = MODEL_SAMPLE_DIR / "preprocessed_dataset.csv"
+    reference_df = pd.read_csv(reference_path, index_col=0)
+    reference_df = reference_df[reference_df["Batch"] == "Source"][["subtype"]]
+
+    mapping_rows = pd.DataFrame({"sample_id": sample_ids, "subtype_int": np.asarray(numeric_labels).reshape(-1)})
+    mapping_rows = mapping_rows.join(reference_df, on="sample_id")
+
+    subtype_info_df = (
+        mapping_rows.dropna(subset=["subtype"])
+        .drop_duplicates(subset=["subtype_int"])
+        .sort_values("subtype_int")[["subtype", "subtype_int"]]
+        .reset_index(drop=True)
+    )
+
+    if subtype_info_df.empty:
+        subtype_values = pd.Series(numeric_labels).dropna().unique().tolist()
+        subtype_info_df = pd.DataFrame(
+            {"subtype": [str(value) for value in subtype_values], "subtype_int": subtype_values}
+        )
+
+    return subtype_info_df
 
 
 def preprocess_bctypefinder(
@@ -215,10 +244,7 @@ def preprocess_bctypefinder(
         raw_x.to_csv(os.path.join(preprocessing_path, "source_X.csv"), mode="w", index=True)
         raw_y.to_csv(os.path.join(preprocessing_path, "source_y.csv"), mode="w", index=True)
 
-        subtype_values = pd.Series(raw_y["subtype"]).dropna().unique().tolist()
-        subtype_info_df = pd.DataFrame(
-            {"subtype": subtype_values, "subtype_int": list(range(len(subtype_values)))}
-        )
+        subtype_info_df = _build_pretrained_subtype_info(sample_ids, raw_y["subtype"].to_numpy())
         subtype_info_df.to_csv(os.path.join(preprocessing_path, "subtype_category_info.csv"), mode="w", index=False)
 
         cpg_info_table = pd.read_csv(MODEL_SAMPLE_DIR / "cpg_info_table.csv")
@@ -238,6 +264,21 @@ def preprocess_bctypefinder(
 
         batch_info_df = pd.DataFrame({'batch': y_category_list, 'domain_idx': y_int_list})
         batch_info_df.to_csv(os.path.join(preprocessing_path, "batch_category_info.csv"), mode="w", index=False)
+        target_data_batch_info = target_data[['Batch']].copy()
+        target_data_features = target_data.drop(columns=['Batch']).T
+
+        cpg_cluster_lookup = cpg_cluster_info.drop_duplicates(subset=["cpg"]).set_index("cpg")
+        target_data_features = target_data_features.loc[
+            target_data_features.index.intersection(cpg_cluster_lookup.index)
+        ]
+
+        tmp = pd.merge(target_data_features, cpg_cluster_lookup.reset_index(), left_index=True, right_on="cpg")
+        tmp.set_index("cpg", inplace=True, drop=True)
+
+        cluster_grouped = tmp.groupby('cluster')
+        cluster_data = cluster_grouped.median().T
+
+        target_data = pd.merge(cluster_data, target_data_batch_info, left_index=True, right_index=True)
         target_data['domain_idx'] = target_data['Batch'].copy()
         target_data['domain_idx'].replace(y_category_list, y_int_list, inplace=True)
 
@@ -298,6 +339,9 @@ def run_bctypefinder(
     os.makedirs(result_dir, exist_ok=True)
 
     preprocessing_path = job_preprocessing_path(user_id, project_id, job_id)
+    x_filename = os.path.join(preprocessing_path, "source_X.csv")
+    y_filename = os.path.join(preprocessing_path, "source_y.csv")
+    target_filename = os.path.join(preprocessing_path, "target_X.csv")
 
     ### ADD ###
     parameters = normalize_model_parameters("BCtypeFinder", model_parameters)
@@ -314,12 +358,9 @@ def run_bctypefinder(
         raw_y.index = sample_ids
         raw_x.index = sample_ids
     else :
-        x_filename = os.path.join(preprocessing_path, "source_X.csv")
-        y_filename = os.path.join(preprocessing_path, "source_y.csv")
         raw_x = pd.read_csv(x_filename, index_col=0)
         raw_y = pd.read_csv(y_filename, index_col=0)
 
-    target_filename = os.path.join(preprocessing_path, "target_X.csv")
     raw_target_x = pd.read_csv(target_filename, index_col=0)
 
     sample_id_list = raw_x.index.tolist()
@@ -730,13 +771,13 @@ def run_bctypefinder(
 
     data_X_embed.to_csv(os.path.join(result_dir, "batch_corrected_features.csv"), mode="w", index=True)
 
-    target_pred = data_X_embed[['Batch', 'Pred_subtype']]
+    target_pred = data_X_embed[['Batch', 'Pred_subtype']].copy()
     # ADD #
     pred_prob_scaled = pd.DataFrame(softmax(pred_prob, axis = 1))
     pred_prob_scaled.columns = subtype_info_df['subtype'].tolist()
     pred_prob_scaled.index = sample_id_list
     row_max_values = pred_prob_scaled.max(axis=1)
-    target_pred['Confidence'] = row_max_values
+    target_pred.loc[:, 'Confidence'] = row_max_values
     #######
     target_pred = target_pred[target_pred['Batch'] != 'Source']
     target_pred.to_csv(os.path.join(result_dir, "results_target_subtype.csv"), mode="w", index=True)
