@@ -1,8 +1,8 @@
-version: "3.9"
+name: cancersubtyper
 
 services:
   db:
-    image: postgres:13
+    image: postgres:17-alpine
     restart: always
     env_file:
       - ./.env
@@ -11,106 +11,77 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  app:
-    build: ./app
-    ports:
-      - "5173:5173"
-    depends_on:
-      - api
-    volumes:
-      - ./app:/app
-      - /app/node_modules
-    env_file:
-      - ./app/.env
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-
   api:
-    build:
-      context: ./api
-      args:
-        INSTALL_R: "false"
+    image: python:3.11-slim-bookworm
+    working_dir: /app
+    restart: always
+    env_file:
+      - ./api/.env
+    depends_on:
+      - db
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-    env_file:
-      - ./api/.env
     volumes:
       - ./api:/app
-    restart: always
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+      - api_venv:/opt/venv
+    command: ["sh", "/app/scripts/dev-python-service.sh", "api"]
+
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    depends_on:
+      - api
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app:/app
+      - ./app/node_modules:/app/node_modules
+    command:
+      - sh
+      - -c
+      - npm install && npm run dev -- --host 0.0.0.0 --port 5173
 
   redis:
-    container_name: redis
-    image: redis:6.2-alpine
+    image: redis:7.4-alpine
+    profiles: ["jobs"]
 
   celery_worker:
-    container_name: celery_worker
-    build:
-      context: ./api
-      dockerfile: Dockerfile.worker
+    image: python:3.11-slim-bookworm
     working_dir: /app
-    command: ["celery", "-A", "celery_config", "worker", "--loglevel=info", "--concurrency=2"]
-    volumes:
-      - ./api:/app
-      - ./api/data:/app/data
+    profiles: ["jobs"]
     env_file:
       - ./api/.env
     depends_on:
-      - redis
       - db
       - api
-    # GPU support - requires NVIDIA Container Toolkit installed
-    # If you don't have GPU support, comment out the deploy section below
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
-  flower:
-    container_name: flower
-    build:
-      context: ./api
-      dockerfile: Dockerfile.worker
-    working_dir: /app
-    command: ["celery", "-A", "celery_config", "flower", "--broker=$(CELERY_BROKER_URL)", "--port=5555"]
+      - redis
     volumes:
       - ./api:/app
-    ports:
-      - "5556:5555"
+      - api_venv:/opt/venv
+      - worker_r_libs:/opt/r-libs
+    environment:
+      R_LIBS_USER: /opt/r-libs
+    command: ["sh", "/app/scripts/dev-python-service.sh", "worker"]
+
+  flower:
+    image: python:3.11-slim-bookworm
+    working_dir: /app
+    profiles: ["jobs"]
     env_file:
       - ./api/.env
     depends_on:
       - redis
       - celery_worker
-    # GPU support - requires NVIDIA Container Toolkit installed
-    # If you don't have GPU support, comment out the deploy section below
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: nginx
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #     - ./nginx/ssl:/etc/nginx/ssl
-  #     - ./app/dist:/var/www/html  # For serving static files
-  #   depends_on:
-  #     - app
-  #     - api
-  #   restart: always
+    ports:
+      - "5556:5555"
+    volumes:
+      - ./api:/app
+      - api_venv:/opt/venv
+    command: ["sh", "/app/scripts/dev-python-service.sh", "flower"]
 
 volumes:
   postgres_data:
+  api_venv:
+  worker_r_libs:

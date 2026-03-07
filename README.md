@@ -397,13 +397,13 @@ cd path/to/your/cancersubtyper
 **Step 1:** Run the application with this command:
 
 ```bash
-docker compose up --build
+docker compose up
 ```
 
 **What this command does:**
 - `docker compose` - tells Docker to run multiple containers together
 - `up` - starts the containers
-- `--build` - rebuilds the images to include any code changes
+- starts the default development stack: PostgreSQL, API, and frontend
 
 **Step 2:** You'll see lots of output scrolling in your terminal. This is normal! 
 <!--
@@ -416,7 +416,7 @@ Docker is:
 6. Starting Celery workers (for background tasks)
 7. Enabling hot-reload (🧾 automatic updates when you change code)
 -->
-**⚠️ First-time setup:** This step will take several minutes the first time (5-15 minutes) because Docker needs to download all the required software. Subsequent startups will be much faster (30-60 seconds).
+**⚠️ First-time setup:** This step will take several minutes the first time because Docker needs to download the base images and install application dependencies into persistent development volumes. Subsequent startups should be much faster because those dependencies are reused.
 
 **Step 3:** You'll know everything is ready when you see messages like:
 - "Application startup complete"
@@ -439,6 +439,12 @@ You can now access the application at **http://localhost:5173**. If you successf
 **To restart the application:**
 ```bash
 docker compose up
+```
+
+**Optional job services:** Redis, Celery worker, and Flower are now behind the `jobs` profile so they do not slow down the default startup path. Start them only when you need background job execution:
+
+```bash
+docker compose --profile jobs up
 ```
 
 <details>
@@ -468,9 +474,9 @@ By default, the application runs without GPU support. If you have an NVIDIA GPU 
    # Lines 90-98 for flower
    ```
 
-4. **Run the application:**
+4. **Run the application with the job profile:**
    ```bash
-   docker compose up --build
+   docker compose --profile jobs up
    ```
 
 #### Current GPU Configuration:

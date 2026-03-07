@@ -1,5 +1,5 @@
 import datetime
-import pytz
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 
 def get_utc_time():
     """Returns the current time in UTC format."""
@@ -17,5 +17,10 @@ def convert_to_user_tz(dt: datetime.datetime, user_timezone: str) -> datetime.da
         datetime.datetime: The datetime object in the user's timezone.
     """
 
-    timezone = pytz.timezone(user_timezone) if user_timezone in pytz.all_timezones else pytz.utc
-    return dt.replace(tzinfo=pytz.utc).astimezone(timezone)
+    try:
+        timezone = ZoneInfo(user_timezone) if user_timezone in available_timezones() else datetime.timezone.utc
+    except ZoneInfoNotFoundError:
+        timezone = datetime.timezone.utc
+
+    aware_dt = dt if dt.tzinfo else dt.replace(tzinfo=datetime.timezone.utc)
+    return aware_dt.astimezone(timezone)

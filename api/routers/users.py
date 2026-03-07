@@ -1,3 +1,5 @@
+from zoneinfo import available_timezones
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import User
@@ -5,11 +7,10 @@ from database import get_db
 from helpers.security import get_current_user
 from schemas.users import UserTimezoneUpdate, UserTimezoneResponse, StorageUsageResponse
 from config import settings
-import pytz
 
 router = APIRouter()
 
-VALID_TIMEZONES = set(pytz.all_timezones)
+VALID_TIMEZONES = available_timezones()
 
 @router.put("/timezone", response_model=UserTimezoneResponse)
 def update_user_timezone(

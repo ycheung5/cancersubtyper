@@ -1,41 +1,38 @@
 # ASGI server
-uvicorn~=0.23.2
+uvicorn>=0.34,<1.0
 
 # Web framework and related libraries
-fastapi~=0.110.3
-aiofiles~=23.1.0
-python-multipart~=0.0.9  # Handling form data in FastAPI
+fastapi>=0.115,<1.0
+aiofiles>=24.1,<26.0
+python-multipart>=0.0.20,<1.0  # Handling form data in FastAPI
 
 # Authentication and Security
 python-jose~=3.3.0  # JWT tokens
-PyJWT~=2.8.0  # Additional JWT handling
-bcrypt~=4.0.1  # Password hashing (already implemented)
-cryptography~=42.0.5  # Needed for JWT & security
+PyJWT>=2.10,<3.0  # Additional JWT handling
+bcrypt>=4.2,<6.0  # Password hashing (already implemented)
+cryptography>=44.0,<47.0  # Needed for JWT & security
 
 # Task queue and background workers
-celery~=5.4.0
-redis~=4.6.0  # Redis support for Celery
-flower~=1.2.0  # Celery monitoring tool
-kombu~=5.3.5  # Needed for Celery-Redis integration
+celery>=5.5,<6.0
+redis>=5.2,<8.0  # Redis support for Celery
+flower>=2.0,<3.0  # Celery monitoring tool
+kombu>=5.5,<6.0  # Needed for Celery-Redis integration
 
 # Database and ORM
-SQLAlchemy~=2.0.37
-psycopg2-binary~=2.9.10  # PostgreSQL driver
-alembic~=1.13.1  # Database migrations
-
-# Timezone support
-pytz~=2024.1  # Handle timezones correctly
+SQLAlchemy>=2.0.37,<2.1
+psycopg2-binary>=2.9.10,<3.0  # PostgreSQL driver
+alembic>=1.14,<2.0  # Database migrations
 
 # Data science and machine learning
-numpy~=1.26.4
-pandas~=2.2.0
-scipy==1.10.1  # Pin to compatible version
-torch~=2.2.2
-torchvision~=0.17.2
-scikit-learn~=1.4.1
-umap-learn~=0.5.5
-lifelines~=0.27.8
-kneed~=0.8.5
+numpy>=1.26,<2.0
+pandas>=2.2,<2.4
+scipy>=1.10,<1.14
+torch>=2.2,<2.4
+torchvision>=0.17,<0.19
+scikit-learn>=1.4,<1.6
+umap-learn>=0.5.5,<0.6
+lifelines>=0.27.8,<0.31
+kneed>=0.8.5,<0.9
 
 # Environment management
-python-dotenv~=1.0.1  # Managing environment variables
+python-dotenv>=1.0,<2.0  # Managing environment variables
