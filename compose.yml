@@ -45,12 +45,10 @@ services:
 
   redis:
     image: redis:7.4-alpine
-    profiles: ["jobs"]
 
   celery_worker:
     image: python:3.11-slim-bookworm
     working_dir: /app
-    profiles: ["jobs"]
     env_file:
       - ./api/.env
     depends_on:
@@ -68,7 +66,6 @@ services:
   flower:
     image: python:3.11-slim-bookworm
     working_dir: /app
-    profiles: ["jobs"]
     env_file:
       - ./api/.env
     depends_on:
