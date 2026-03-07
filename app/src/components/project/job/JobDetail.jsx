@@ -280,7 +280,7 @@ const JobDetail = ({ project }) => {
                             </label>
                         </div>
                         <p className="mt-2 text-xs text-base-content/70">
-                            For the hyperparameter setting, the below default values are provided. Most users should not need to change them.
+                        Detailed description for pre-trained model can be found in “https://github.com/ycheung5/cancersubtyper?tab=readme-ov-file#pretrained-model”. Please upload the target dataset after reading the description.
                         </p>
                     </div>
 
@@ -362,9 +362,12 @@ const JobDetail = ({ project }) => {
                         <div className="card-body gap-5 p-5">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div>
-                                    <h3 className="card-title text-base">Hyperparameters</h3>
+                                    <h3 className="card-title text-base">Hyperparameter Setting</h3>
                                     <p className="text-xs text-base-content/60">
                                         The defaults are suitable for most runs. Hover over the info icons for plain-language explanations.
+                                    </p>
+                                    <p className="text-xs text-base-content/60">
+                                        For the hyperparameter setting, the below default values are provided. Most users should not need to change them.
                                     </p>
                                 </div>
                                 <div className="badge badge-outline badge-primary">Default-ready</div>
