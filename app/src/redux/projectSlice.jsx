@@ -67,14 +67,16 @@ export const uploadSampleFile = createAsyncThunk(
     "project/uploadSample",
     async ({ project_id, sourceFile, targetFile, setProgress, cancelTokenSource, abortSignal }, { rejectWithValue }) => {
         try {
-            const sourceChecksum = await computeChecksum(sourceFile, abortSignal);
             const targetChecksum = await computeChecksum(targetFile, abortSignal);
+            const sourceChecksum = sourceFile ? await computeChecksum(sourceFile, abortSignal) : null;
 
             const formData = new FormData();
-            formData.append("source", sourceFile);
             formData.append("target", targetFile);
-            formData.append("source_checksum", sourceChecksum);
             formData.append("target_checksum", targetChecksum);
+            if (sourceFile && sourceChecksum) {
+                formData.append("source", sourceFile);
+                formData.append("source_checksum", sourceChecksum);
+            }
 
             const res = await api.put(`/project/${project_id}/upload`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },

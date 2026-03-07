@@ -40,9 +40,9 @@ async def create_project(
 async def upload_project_samples(
     project_id: int,
     target: UploadFile = File(...),
-    source: UploadFile = File(...),
+    source: UploadFile | None = File(None),
     target_checksum: str = Form(...),
-    source_checksum: str = Form(...),
+    source_checksum: str | None = Form(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -54,14 +54,19 @@ async def upload_project_samples(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Project not found")
     if project.user_id != current_user.id:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="You do not have permission to modify this project")
-    if not target.filename.endswith(".gz") or not source.filename.endswith(".gz"):
+    if not target.filename.endswith(".gz"):
+        raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only .gz files are supported")
+    if source is not None and not source.filename.endswith(".gz"):
         raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only .gz files are supported")
 
     # File paths
     target_gz_path = target_sample_file_path(current_user.id, project_id, target.filename)
-    source_gz_path = source_sample_file_path(current_user.id, project_id, source.filename)
+    source_gz_path = (
+        source_sample_file_path(current_user.id, project_id, source.filename)
+        if source is not None else None
+    )
     target_csv_path = target_gz_path[:-3]
-    source_csv_path = source_gz_path[:-3]
+    source_csv_path = source_gz_path[:-3] if source_gz_path else None
 
     # Track old sizes for rollback
     old_target_csv_path = (
@@ -70,7 +75,7 @@ async def upload_project_samples(
     )
     old_source_csv_path = (
         source_sample_file_path(current_user.id, project_id, project.source_file)
-        if project.source_file else None
+        if source is not None and project.source_file else None
     )
 
     old_target_size = os.path.getsize(old_target_csv_path) if old_target_csv_path and os.path.exists(old_target_csv_path) else 0
@@ -85,34 +90,46 @@ async def upload_project_samples(
 
     # Write new gz files
     computed_target_checksum = await write_uploadfile_chunked_async(target, target_gz_path)
-    computed_source_checksum = await write_uploadfile_chunked_async(source, source_gz_path)
+    computed_source_checksum = (
+        await write_uploadfile_chunked_async(source, source_gz_path)
+        if source is not None and source_gz_path is not None else None
+    )
 
-    if computed_target_checksum != target_checksum or computed_source_checksum != source_checksum:
+    if computed_target_checksum != target_checksum or (
+        source is not None and computed_source_checksum != source_checksum
+    ):
         await delete_file_async(target_gz_path)
-        await delete_file_async(source_gz_path)
+        if source_gz_path:
+            await delete_file_async(source_gz_path)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Checksum mismatch")
 
     # Decompress
     try:
         with gzip.open(target_gz_path, 'rb') as f_in, open(target_csv_path, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-        with gzip.open(source_gz_path, 'rb') as f_in, open(source_csv_path, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
+        if source_gz_path and source_csv_path:
+            with gzip.open(source_gz_path, 'rb') as f_in, open(source_csv_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
         # Delete original .gz files
         await delete_file_async(target_gz_path)
-        await delete_file_async(source_gz_path)
+        if source_gz_path:
+            await delete_file_async(source_gz_path)
     except Exception:
         await delete_file_async(target_gz_path)
-        await delete_file_async(source_gz_path)
+        if source_gz_path:
+            await delete_file_async(source_gz_path)
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to decompress gzip files")
 
     # Check storage quota (adjusted for replacement)
-    new_total = os.path.getsize(target_csv_path) + os.path.getsize(source_csv_path)
+    new_total = os.path.getsize(target_csv_path)
+    if source_csv_path:
+        new_total += os.path.getsize(source_csv_path)
     net_storage_change = new_total - old_total
 
     if current_user.storage_used + net_storage_change > settings.max_storage_bytes:
         await delete_file_async(target_csv_path)
-        await delete_file_async(source_csv_path)
+        if source_csv_path:
+            await delete_file_async(source_csv_path)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Upload exceeds your storage quota")
 
     # Update user storage usage
@@ -120,7 +137,9 @@ async def upload_project_samples(
 
     # Update DB with new filenames
     return project_repo.upload_project_samples(
-        project_id, os.path.basename(target_csv_path), os.path.basename(source_csv_path)
+        project_id,
+        os.path.basename(target_csv_path),
+        os.path.basename(source_csv_path) if source_csv_path else None,
     )
 
 @router.put("/{project_id}/upload_metadata", status_code=HTTPStatus.OK, response_model=ProjectResponse)

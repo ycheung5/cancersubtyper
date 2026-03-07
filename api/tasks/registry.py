@@ -1,6 +1,10 @@
 # Register preprocessing & execution functions dynamically
-from tasks.subtyping_models.bctypefinder import preprocess_bctypefinder, run_bctypefinder
-from tasks.subtyping_models.cancersubminer import preprocess_cancersubminer, run_cancersubminer
+from tasks.subtyping_models.version_2_loader import (
+    preprocess_bctypefinder,
+    preprocess_cancersubminer,
+    run_bctypefinder,
+    run_cancersubminer,
+)
 
 MODEL_REGISTRY = {
     "BCtypeFinder": {

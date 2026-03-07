@@ -39,8 +39,8 @@ const UploadSample = ({ projectId, onClose }) => {
     };
 
     const handleUpload = async () => {
-        if (!sourceFile || !targetFile) {
-            setError("Both source and target files are required.");
+        if (!targetFile) {
+            setError("Target file is required. Source file is optional when using a pretrained model.");
             return;
         }
 
@@ -98,7 +98,7 @@ const UploadSample = ({ projectId, onClose }) => {
                 <div className="space-y-4">
                     <div className="alert alert-info">
                         <p className="text-sm">
-                            <strong>Note:</strong> Files must be compressed in .gz format. Use the template buttons to download CSV templates, or download demo datasets directly from Google Drive, then compress them with gzip before uploading.
+                            <strong>Note:</strong> Files must be compressed in .gz format. The target file is required. The source file is optional if you plan to use a pretrained model.
                         </p>
                     </div>
                     
@@ -108,7 +108,7 @@ const UploadSample = ({ projectId, onClose }) => {
                         onDrop={(e) => !loading && handleDrop(e, "source")}
                     >
                         <FaFileUpload className="text-primary text-4xl mb-2" />
-                        <p className="text-base-content text-center">Drag & drop your <strong>Source File (.gz)</strong> here</p>
+                        <p className="text-base-content text-center">Drag & drop your <strong>Source File (.gz, optional)</strong> here</p>
                         <input
                             type="file"
                             className="hidden"
@@ -171,8 +171,8 @@ const UploadSample = ({ projectId, onClose }) => {
                     ) : (
                         <button
                             className="btn btn-primary flex items-center"
-                            onClick={handleUpload}
-                            disabled={!sourceFile || !targetFile}
+                        onClick={handleUpload}
+                            disabled={!targetFile}
                         >
                             <FaSpinner className={`${loading ? "animate-spin" : "hidden"} mr-2`} />
                             Upload

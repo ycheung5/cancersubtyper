@@ -40,7 +40,7 @@ const Project = () => {
 
                             <ProjectDetail project={project} />
                             <SampleDetail projectId={project.id} target={project.target_file} source={project.source_file} />
-                            <JobDetail projectId={project.id} />
+                            <JobDetail project={project} />
                         </div>
                     ) : (
                         <p className="text-lg text-gray-500">Project data is not available.</p>

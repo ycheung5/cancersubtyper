@@ -35,7 +35,7 @@ def run_model(self, job_id: int, model_parameters: list):
         preprocess_func, execute_func = get_model_pipeline(job.model.name)
 
         # Step 4: Run Preprocessing
-        preprocess_func(job.user_id, project.id, job_id, project.source_file, project.target_file)
+        preprocess_func(job.user_id, project.id, job_id, project.source_file, project.target_file, model_parameters)
         print(f"[Job {job_id}] Preprocessing completed.")
 
         # Step 5: Update Job Status to "Running"

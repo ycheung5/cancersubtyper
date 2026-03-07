@@ -9,6 +9,7 @@ from schemas.jobs import JobCreate
 from tasks.task import run_model
 from celery_config import celery
 from helpers.timezone import get_utc_time
+from tasks.model_parameters import normalize_model_parameters
 
 
 class JobRepository(BaseRepository):
@@ -26,8 +27,20 @@ class JobRepository(BaseRepository):
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Model not found")
 
         # Step 3: Check Project Files Exist
-        if not project.source_file or not project.target_file:
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Source or Target file missing in Project")
+        if not project.target_file:
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Target file missing in Project")
+
+        try:
+            normalized_parameters = normalize_model_parameters(model.name, job_data.model_parameters)
+        except ValueError as exc:
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(exc)) from exc
+        job_data.model_parameters = list(normalized_parameters.values())
+        is_using_pretrained_model = bool(normalized_parameters["is_using_pretrained_model"])
+        if not is_using_pretrained_model and not project.source_file:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="Source file missing in Project. Upload a source file or use the pretrained model.",
+            )
 
         # Step 4: Create a New Job
         new_job = Job(

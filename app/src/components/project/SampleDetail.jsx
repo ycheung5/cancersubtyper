@@ -78,7 +78,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                 <div className="p-4 bg-base-100 rounded-lg border border-base-300 shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                         <p className="text-lg font-medium">
-                            <strong>Labeled Data (Source):</strong>
+                            <strong>Labeled Data (Source, optional with pretrained model):</strong>
                         </p>
                         <div className="flex gap-1">
                             <button
@@ -107,7 +107,7 @@ const SampleDetail = ({ projectId, target, source }) => {
                                 <span>{source}</span>
                             </div>
                         ) : (
-                            <span className="text-red-500">No source file uploaded</span>
+                            <span className="text-base-content/70">No source file uploaded. This is valid when using a pretrained model.</span>
                         )}
                     </div>
                 </div>

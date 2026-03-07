@@ -66,14 +66,15 @@ class ProjectRepository(BaseRepository):
         self,
         project_id: int,
         target_filename: str,
-        source_filename: str,
+        source_filename: str | None = None,
     ) -> ProjectResponse:
         project = self.get_project_by_id(project_id)
         if not project:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Project not found")
 
         project.target_file = target_filename
-        project.source_file = source_filename
+        if source_filename is not None:
+            project.source_file = source_filename
         project.edited_at = get_utc_time()
 
         self.db.commit()
